@@ -1,0 +1,60 @@
+
+:root{
+    --red:#ae2a1e;
+    --blue:#4780c3;
+    --lightBlue:#a5bddf;
+    --darkBlue:#284e7d;
+    --yellow:#f9b53a;
+    --offWhite:#f9f9f9;
+    --lightGrey:#efefef;
+    --Font1:'Rethink Sans';
+    --Font2: 'Silkscreen', sans-serif; 
+}
+
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+}
+
+.section-center {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  z-index: 6;
+  text-align: center;
+  transform: translateY(-50%);
+  background-image: linear-gradient(
+      to bottom, 
+      #4781c368, 
+      #a5bddf74, 
+      #284e7ddc
+  ), url(../images/bg-home.jpg);
+  background-color: var(--offWhite);
+  height: 100vh;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+  h1{
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 7vw;
+    line-height: 1;
+    color: #ffeba7;
+    text-align: center;
+    /* -webkit-text-stroke: 2px #ffeba7;
+    text-stroke: 2px #ffeba7; */
+
+
+    color: var(--darkBlue);
+  }
