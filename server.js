@@ -27,6 +27,9 @@ app.get('/login', (req, res) => {
     res.render('login'); // Render the 'login.ejs' view
 });
 
+
+
+// FOR ALL PAGES IN NAV
 app.get('/sessions', (req, res) => {
     res.render('sessions'); // Render the 'sessions.ejs' view
 });
@@ -38,6 +41,9 @@ app.get('/createSession', (req, res) => {
 app.get('/editSession', (req, res) => {
     res.render('editSession'); // Render the 'editSession.ejs' view
 });
+
+// END
+
 
 // Start the server
 app.listen(port, () => {
