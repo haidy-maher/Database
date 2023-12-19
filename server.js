@@ -42,6 +42,19 @@ app.get('/editSession', (req, res) => {
     res.render('editSession'); // Render the 'editSession.ejs' view
 });
 
+
+app.get('/students', (req, res) => {
+    res.render('sessions'); // Render the 'sessions.ejs' view
+});
+
+app.get('/createStudent', (req, res) => {
+    res.render('createSession'); // Render the 'createSession.ejs' view
+});
+
+app.get('/editStudent', (req, res) => {
+    res.render('editSession'); // Render the 'editSession.ejs' view
+});
+
 // END
 
 
