@@ -672,7 +672,7 @@
             <div class="form login">
                 <span class="title">Login</span>
 
-                <form action="#">
+                <form action="/login" method="POST">
                     <div class="input-field">
                         <input type="text" placeholder="Enter your email" required>
                         <i class="uil uil-envelope"></i>
@@ -709,38 +709,35 @@
             <div class="form signup">
                 <span class="title">Registration</span>
 
-                <form action="#">
+                <form action="/signup" method="POST" enctype="application/json" id="signupForm" onsubmit="submitForm()">
+
+ 
                     <div class="input-field">
-                        <input type="text" placeholder="Enter your name" required>
+                        <input type="text" name="username" placeholder="Enter yourr name" required>
                         <i class="uil uil-user"></i>
                     </div>
                     <div class="input-field">
-                        <input type="text" placeholder="Enter your email" required>
+                        <input type="text" name="email" placeholder="Enter your email" required>
                         <i class="uil uil-envelope"></i>
                     </div>
-
                     <div class="input-field">
-                        <input type="password" placeholder="Create a password" required>
-                        <i class="uil uil-lock icon"></i>
-                    </div>
-                    <div class="input-field">
-                        <input type="password" class="password" placeholder="Confirm a password" required>
+                        <input type="password" name="password" placeholder="Password" required>
                         <i class="uil uil-lock icon"></i>
                         <i class="uil uil-eye-slash showHidePw"></i>
                     </div>
 
-                    <div class="checkbox-text">
-                        <div class="checkbox-content">
-                            <input type="checkbox" id="signCheck">
-                            <label for="signCheck" class="text">I accept all terms & conditions</label>
-                        </div>
-                    </div>
 
                     <div class="input-field button">
-                        <input type="button" value="Register Now">
+                        <input type="submit" value="Register Now">
                     </div>
                 </form>
 
+                <div class="checkbox-text">
+                  <div class="checkbox-content">
+                      <input type="checkbox" id="signCheck">
+                      <label for="signCheck" class="text">I accept all terms & conditions</label>
+                  </div>
+              </div>
                 <div class="login-signup">
                     <span class="text">Already have an account?
                         <a href="#" class="text login-link">Login now</a>
@@ -751,5 +748,41 @@
     </div>
     <!-- Include your JavaScript file -->
     <script src="/js/signin.js"></script>
+
+<script>
+    function submitForm() {    event.preventDefault(); // Add this line to prevent default form submission
+      const form = document.getElementById('signupForm');
+form.addEventListener('submit', submitForm);
+
+        const formData = {
+            username: form.querySelector('[name="username"]').value,
+            email: form.querySelector('[name="email"]').value,
+            password: form.querySelector('[name="password"]').value
+        };
+
+        fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+        .then(response => response.text()) // Use text() instead of json()
+.then(data => {
+    try {
+        const jsonData = JSON.parse(data);
+        console.log('Success:', jsonData);
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+    }
+})
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+</script>
 </body>
 </html>
