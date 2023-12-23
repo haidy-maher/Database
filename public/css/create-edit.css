@@ -28,12 +28,13 @@ body, h1, p, input, textarea, button {
   input[type="text"],
   input[type="email"],
   input[type="date"],
+  input[type="file"],
   input[type="number"],
   textarea {
     width: 100%;
     padding: 8px;
     border: 2px solid transparent;
-    background-color: #eceaea;
+    background-color: #eceaea !important;
     border-radius: 3px;
   }
   
@@ -41,7 +42,7 @@ body, h1, p, input, textarea, button {
     height: 100px;
   }
   
-  form button {
+  form .button input {
     padding: 10px 20px;
     background-color: hsl(257, 11%, 16%) ;
     color: white;
@@ -50,7 +51,7 @@ body, h1, p, input, textarea, button {
     cursor: pointer;
   }
   
-  button:hover {
+  .button input:hover {
     background-color:  hsl(257, 11%, 16%)   ;
   }
   

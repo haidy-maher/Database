@@ -20,6 +20,15 @@
     rel="stylesheet">
 </head>
 
+<style>
+
+form div{
+    margin-bottom: 20px;
+}
+
+
+</style>
+
 <body>
   <%- include('dashboardNav.ejs') %>
 
@@ -27,26 +36,38 @@
     <div class="main">
       <div class="header">
         <div class="title">
-          <h3>Create Sessions</h3>
+          <h3>Upload Media</h3>
         </div>
       </div>
       <div class="content">
-        <form method="POST" id="createForm">
-          <div class="form-group">
-            <label for="name">Topic Name</label>
-            <input type="text" id="name" name="topicName">
-          </div>
+     
+   
+            <form action="/events"  id="createForm"  method="POST" enctype="multipart/form-data">
 
-          <div class="form-group">
-            <label for="email">Date</label>
-            <input type="date" id="email" name="date"> <!-- Corrected 'Date' to 'date' -->
-          </div>
+            <div class="input-group">
+  
+                <div class="custom-file">
+                    <span class="input-group-text">Upload</span>
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                </div>  
+            </div>
+            <div class="form-group">
+                <label for="date">Date of event:</label>
+                <input class="form-control" type="text" name="date" placeholder="date" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input class="form-control" type="date" name="time" placeholder="time" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description: (optional)</label>
+                <textarea class="form-control" rows="5" type="text" name="description" placeholder="description"></textarea>
+            </div>
+            <div class="input-field button">
+                <input type="submit" value="Upload"> <!-- Changed to 'submit' type -->
+              </div>
+            </form>
 
-          <div class="input-field button">
-            <input type="submit" value="Register Now"> <!-- Changed to 'submit' type -->
-          </div>
-        </form>
-      </div>
     </div>
 
     <script>
