@@ -137,13 +137,13 @@ app.post('/createSession', async (req, res) => {
     const newSession = new Sessions({ topicName, date });
     await newSession.save();
 
+    res.redirect('/sessions');
     res.status(201).json({ message: 'Session created successfully' });
   } catch (error) {
     console.error('Error creating session:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 
 
@@ -163,7 +163,8 @@ app.post('/updateSession/:id', async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    res.status(200).json({ message: 'Session updated successfully', session });
+    // Redirect to /sessions upon successful update
+    res.redirect('/sessions');
   } catch (error) {
     console.error('Error updating session:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -178,7 +179,6 @@ app.get('/getSession/:id', async (req, res) => {
 
   try {
     const session = await Sessions.findById(sessionId);
-
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }

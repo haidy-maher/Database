@@ -73,6 +73,7 @@ async function fetchSessionData(sessionId) {
     document.getElementById('name').value = data.topicName;
     document.getElementById('date').value = data.date.substring(0, 10); // Extracting the date part
     document.getElementById('attendance-number').value = data.attendanceNumber;
+
   } catch (error) {
     console.error('Error fetching session data:', error);
     // Handle error, e.g., show an error message to the user
@@ -91,6 +92,7 @@ function getSessionIdFromURL() {
   return url.substring(lastSlashIndex + 1);
 }
 
+// Function to handle form submission
 // Function to handle form submission
 function submitSessionForm(event) {
   event.preventDefault(); // Prevent default form submission
@@ -114,6 +116,10 @@ function submitSessionForm(event) {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
+    // Check if the response is a redirect
+    if (response.redirected) {
+      window.location.href = response.url; // Redirect to the URL specified by the server
+    }
     return response.json(); // Return JSON response from server
   })
   .then(data => {
@@ -126,12 +132,12 @@ function submitSessionForm(event) {
   });
 }
 
+
 const form = document.getElementById('editForm');
 form.addEventListener('submit', submitSessionForm);
 
 
-
-    </script>
+</script>
 
 </body>
 
