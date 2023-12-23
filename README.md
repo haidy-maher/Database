@@ -13,6 +13,6 @@ material, sheets, submissions, ratings => (Ashraf)
 media, contests, announcments => (Haidy)
 
 5) UI for Seacrh bar, sort ASC & DEC => (Haidy)
-6) Login & Signu up => (Ashraf)
+6) Login & Sign up => (Ashraf)
 
 
