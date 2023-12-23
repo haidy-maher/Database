@@ -31,24 +31,33 @@
     <div class="main">
       <div class="header">
         <div class="title">
-          <h3>Sessions</h3>
+          <h3>Material</h3>
         </div>
         <div class="button">
-          <p><a href="/addmmaterial">CREATE <span><i class="fa-solid fa-plus"></i></span></a></p>
+          <p><a href="/addmaterial">CREATE <span><i class="fa-solid fa-plus"></i></span></a></p>
         </div>
       </div>
       <div class="content">
 
-        <table>
+        <table style="color: black;">
           <thead id="header">
             <tr>
-              <th scope="col">File</th>
-              <th scope="col">File Name</th>
-              <th scope="col">Date Uploaded</th>
+              <th scope="col" style="font-weight: bold;">File</th>
+              <th scope="col" style="font-weight: bold;">File Name</th>
+              <th scope="col" style="font-weight: bold;">Date Uploaded</th>
             </tr>
           </thead>
-       
-        </table>  
+          <tbody>
+            <% materials.forEach(material => { %>
+              <tr>
+                <td><a href="/materialDownload/<%= material._id %>" style="color: black; font-weight: bold;"><%= material.title %></a></td>
+                <td style="font-weight: bold;"><%= material.title %></td>
+                <td style="font-weight: bold;"><%= material.uploadDate %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        
 
       </div>
 

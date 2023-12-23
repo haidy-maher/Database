@@ -96,19 +96,8 @@ app.post('/materialUpload', upload.single('pdfFile'), async (req, res) => {
     // PDF specific handling
   }
   await newMaterial.save();
+  res.redirect('/material');
 
-  // Create a GridFS stream for writing
-  const writeStream = gfs.createWriteStream({
-    filename: originalname,
-  });
-
-  // Write the buffer to GridFS
-  writeStream.write(buffer);
-  writeStream.end();
-
-  writeStream.on('close', () => {
-    res.status(201).json({ message: 'Material uploaded successfully', materialId: newMaterial._id });
-  });
 });
 
 
@@ -345,8 +334,16 @@ app.get('/login', (req, res) => {
   res.render('login'); // Render the 'login.ejs' view
 });
 
-app.get('/material', (req, res) => {
-  res.render('material'); // Render the 'login.ejs' view
+app.get('/material', async (req, res) => {
+  try {
+    // Fetch data from the "Material" collection
+    const materials = await Material.find();
+
+    res.render('material', { materials }); // Pass the data to "material.ejs" for rendering
+  } catch (error) {
+    console.error('Error fetching materials:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 app.get('/addmaterial', (req, res) => {
   res.render('addmaterial'); // Render the 'login.ejs' view
