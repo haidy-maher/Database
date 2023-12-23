@@ -21,12 +21,9 @@
 </head>
 
 <style>
-
-form div{
+  form div {
     margin-bottom: 20px;
-}
-
-
+  }
 </style>
 
 <body>
@@ -36,71 +33,46 @@ form div{
     <div class="main">
       <div class="header">
         <div class="title">
-          <h3>Upload Media</h3>
+          <h3>Upload Material</h3>
         </div>
       </div>
       <div class="content">
-     
+
+
+        <form action="/mediaUpload" id="uploadForm" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="image">Upload Image</label>
+            <input class="form-control" type="file" name="image" accept="image/*" required>
+          </div>
    
-            <form action="/events"  id="createForm"  method="POST" enctype="multipart/form-data">
+          <div class="input-field button">
+            <input type="submit" value="Upload"> <!-- Changed to 'submit' type -->
+          </div>
+        </form>
 
-            <div class="input-group">
-  
-                <div class="custom-file">
-                    <span class="input-group-text">Upload</span>
-                    <input type="file" id="image" name="image" accept="image/*" required>
-                </div>  
-            </div>
-       
+      </div>
+
+      <script>
+        document.getElementById('uploadForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          var formData = new FormData(this);
+          fetch('/mediaUpload', {
+            method: 'POST',
+            body: formData
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.text();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+        });
+
         
-            <div class="input-field button">
-                <input type="submit" value="Upload"> <!-- Changed to 'submit' type -->
-              </div>
-            </form>
-
-    </div>
-
-    <script>
-      function submitSessionForm(event) {
-        event.preventDefault(); // Prevent default form submission
-        const form = document.getElementById('createForm');
-
-        const formData = {
-          topicName: form.querySelector('[name="topicName"]').value,
-          date: form.querySelector('[name="date"]').value,
-        };
-
-        fetch('/createSession', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            // Check if the response is a redirect
-            if (response.redirected) {
-              window.location.href = response.url; // Redirect to the URL specified by the server
-            }
-            return response.json(); // Return JSON response from server
-          })
-          .then(data => {
-            console.log('Success:', data);
-            // Handle success, e.g., show a success message or redirect
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-            // Handle error, e.g., show an error message to the user
-          });
-      }
-
-      const form = document.getElementById('createForm');
-      form.addEventListener('submit', submitSessionForm);
-
-    </script>
+      </script>
 </body>
 
 </html>

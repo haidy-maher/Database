@@ -29,9 +29,8 @@ const sessionsSchema = new mongoose.Schema({
 const mediaSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
-  mediaType: { type: String, enum: ['image', 'video', 'pdf'] },
-  uploadedAt: { type: Date, default: Date.now },
-  mediaType: { type: String, enum: ['image', 'video', 'pdf'] },
+  fileType: { type: String, required: true },
+  uploadDate: { type: Date, default: Date.now },
 });
 
 const materialSchema = new mongoose.Schema({
@@ -65,6 +64,30 @@ app.use((req, res, next) => {
 
 // Serve static files
 app.use(express.static('public'));
+
+
+app.post('/mediaUpload', upload.single('image'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded');
+  }
+
+  const { originalname, mimetype, buffer } = req.file;
+
+
+
+  // Save file details in Material collection
+  const newMedia = new Media({
+    title: originalname,
+    fileType: mimetype
+  });
+  
+
+  
+  await newMedia.save();
+  res.redirect('/media');
+
+});
+
 
 app.post('/materialUpload', upload.single('pdfFile'), async (req, res) => {
   if (!req.file) {
