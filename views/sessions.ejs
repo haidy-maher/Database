@@ -84,8 +84,6 @@
       </div>
 
     </div>
-
-
     <script>
       // Function to handle session deletion
       function deleteSession(sessionId) {
@@ -100,16 +98,16 @@
           })
           .then(data => {
             console.log('Session deleted:', data);
-            // Reload the page to reflect the updated sessions after deletion
-            window.location.reload(); // Reload the page
+            // Remove the deleted session row from the table without reloading the page
+            const deletedRow = document.querySelector(`[data-session-id="${sessionId}"]`).closest('tr');
+            deletedRow.remove();
           })
           .catch(error => {
             console.error('Error deleting session:', error);
             // Handle error, show an error message, or perform necessary actions
           });
       }
-
-      // Event listener to handle click on delete icon
+    
       // Event listener to handle click on delete icon
       document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-icon')) {
@@ -120,9 +118,8 @@
           }
         }
       });
-
     </script>
-
+    
 
 </body>
 

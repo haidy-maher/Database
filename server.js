@@ -157,7 +157,8 @@ app.delete('/deleteSession/:id', async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    res.redirect('/sessions'); // Redirect after session deletion
+    // Respond with a success message indicating the deletion
+    res.status(200).json({ message: 'Session deleted successfully' });
   } catch (error) {
     console.error('Error deleting session:', error);
     res.status(500).json({ error: 'Internal Server Error' });
