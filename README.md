@@ -8,9 +8,9 @@ https://ashrafhany.notion.site/Database-3e28a383255443789f78a2b12e2835e9
 3) CRUD : sessions, students, teams, material, media, contests, sheets, submissions, ratings, announcments, profile
 sessions, students, teams => (John)
 
-material, sheets, submissions, ratings => (Ashraf)
+material, sheets, submissions => (Ashraf)
 
-media, contests, announcments => (Haidy)
+media, contests, announcments, ratings => (Haidy)
 
 5) UI for Seacrh bar, sort ASC & DEC => (Haidy)
 6) Login & Sign up => (Ashraf)
