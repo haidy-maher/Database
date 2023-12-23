@@ -146,6 +146,24 @@ app.post('/createSession', async (req, res) => {
   }
 });
 
+// Assuming you have an endpoint to handle session deletion by ID
+app.delete('/deleteSession/:id', async (req, res) => {
+  const sessionId = req.params.id;
+
+  try {
+    const deletedSession = await Sessions.findByIdAndDelete(sessionId);
+
+    if (!deletedSession) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    res.redirect('/sessions'); // Redirect after session deletion
+  } catch (error) {
+    console.error('Error deleting session:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 app.post('/updateSession/:id', async (req, res) => {
