@@ -5,10 +5,8 @@ https://ashrafhany.notion.site/Database-3e28a383255443789f78a2b12e2835e9
 
 2) Connect To Database (John)
 
-3) CRUD : students, teams, material, media, contests, sheets, submissions, ratings, announcments, profile
+3) CRUD : sessions (Done), students, teams, material, media, contests, announcments
 
-
-    => (John)
 material,contests , teams   => (Ashraf)
 media,students, sessions (Done) , announcments,  => (Haidy)
 

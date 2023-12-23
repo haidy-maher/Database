@@ -26,10 +26,17 @@ const sessionsSchema = new mongoose.Schema({
   attendanceNumber: { type: Number, required: false, unique: false },
 });
 
+const mediaSchema = new mongoose.Schema({
+  topicName: { type: String, required: true, unique: false },
+  date: { type: Date, required: true, unique: false },
+  attendanceNumber: { type: Number, required: false, unique: false },
+});
+
 
 
 const User = mongoose.model('User', userSchema);
 const Sessions = mongoose.model('Sessions', sessionsSchema);
+
 
 // Initialize GridFS
 let gfs;
@@ -275,6 +282,7 @@ app.get('/sessions', async (req, res) => {
 
 
 
+
 app.get('/createSession', (req, res) => {
   res.render('createSession'); // Render the 'createSession.ejs' view
 });
@@ -284,20 +292,42 @@ app.get('/editSession', (req, res) => {
 });
 
 
-app.get('/students', (req, res) => {
-  res.render('sessions'); // Render the 'sessions.ejs' view
-});
-
-app.get('/createStudent', (req, res) => {
-  res.render('createSession'); // Render the 'createSession.ejs' view
-});
-
-app.get('/editStudent', (req, res) => {
-  res.render('editSession'); // Render the 'editSession.ejs' view
-});
-
 // END
 
+
+
+
+// media
+
+const MediaSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  mediaType: { type: String, enum: ['image', 'video'] },
+  uploadedAt: { type: Date, default: Date.now },
+});
+
+const Media = mongoose.model('Media', mediaSchema);
+
+app.get('/media', async (req, res) => {
+  try {
+    const media = await Media.find(); // Fetch media from the database
+
+    res.render('media', { media }); // Pass fetched media to the view
+  } catch (error) {
+    console.error('Error fetching media:', error); // Log the specific error
+    res.status(500).send('Error fetching media'); // Send a more descriptive error message
+  }
+});
+
+// Route to handle GET requests to /addMedia
+app.get('/addMedia', (req, res) => {
+  // Logic to handle rendering addMedia.ejs
+  // You might pass any necessary data to the template here
+  res.render('addMedia'); // Render addMedia.ejs
+});
+
+
+// Media End
 
 // Start the server
 app.listen(port, () => {
