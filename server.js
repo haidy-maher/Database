@@ -20,7 +20,16 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
 });
 
+const sessionsSchema = new mongoose.Schema({
+  topicName: { type: String, required: true, unique: false },
+  date: { type: Date, required: true, unique: false },
+  attendanceNumber: { type: Number, required: false, unique: false },
+});
+
+
+
 const User = mongoose.model('User', userSchema);
+const Sessions = mongoose.model('Sessions', sessionsSchema);
 
 // Initialize GridFS
 let gfs;
@@ -112,6 +121,34 @@ app.post('/signup', async (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
+
+  app.post('/createSession', async (req, res) => {
+    console.log('Request Body:', req.body);
+  
+    if (!req.body || !req.body.topicName || !req.body.date) {
+      return res.status(400).json({ error: 'Invalid request body' });
+    }
+  
+    const { topicName, date } = req.body;
+  
+    try {
+      const existingSession = await Sessions.findOne({ topicName });
+  
+      if (existingSession) {
+        return res.status(409).json({ error: 'Session already exists' });
+      }
+  
+      const newSession = new Sessions({ topicName, date });
+      await newSession.save();
+  
+      res.status(201).json({ message: 'Session created successfully' });
+    } catch (error) {
+      console.error('Error creating session:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
