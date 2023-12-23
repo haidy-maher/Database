@@ -671,9 +671,7 @@
     <div class="container">
         <div class="forms">
             <div class="form login">
-                <span class="title">Login</span>
-
-
+                <span class="title">Login</span>  
                 <form action="/login" method="POST" enctype="application/json" id="loginform" onsubmit="submitForm()">
 
  
@@ -762,7 +760,6 @@ form.addEventListener('submit', submitForm);
             email: form.querySelector('[name="email"]').value,
             password: form.querySelector('[name="password"]').value
         };
-
         fetch('/signup', {
             method: 'POST',
             headers: {

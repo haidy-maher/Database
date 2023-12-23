@@ -31,7 +31,6 @@ const mediaSchema = new mongoose.Schema({
   description: String,
   mediaType: { type: String, enum: ['image', 'video', 'pdf'] },
   uploadedAt: { type: Date, default: Date.now },
-  mediaType: { type: String, enum: ['image', 'video', 'pdf'] },
 });
 
 const materialSchema = new mongoose.Schema({
@@ -66,23 +65,12 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static('public'));
 
-app.post('/materialUpload', upload.single('pdfFile'), async (req, res) => {
+app.post('/materialUpload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded');
   }
 
   const { originalname, mimetype, buffer } = req.file;
-
-  // Check if the file is a PDF
-  if (mimetype !== 'application/pdf') {
-    return res.status(400).send('Only PDF files are allowed');
-  }
-
-  // Include handling for PDFs
-  if (mimetype !== 'application/pdf') {
-    return res.status(400).send('Only PDF files are allowed');
-  }
-
 
   // Save file details in Material collection
   const newMaterial = new Material({
@@ -347,9 +335,6 @@ app.get('/login', (req, res) => {
 
 app.get('/material', (req, res) => {
   res.render('material'); // Render the 'login.ejs' view
-});
-app.get('/addmaterial', (req, res) => {
-  res.render('addmaterial'); // Render the 'login.ejs' view
 });
 
 
