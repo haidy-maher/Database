@@ -672,7 +672,10 @@
             <div class="form login">
                 <span class="title">Login</span>
 
-                <form action="/login" method="POST">
+
+                <form action="/login" method="POST" enctype="application/json" id="loginform" onsubmit="submitForm()">
+
+ 
                     <div class="input-field">
                         <input type="text" placeholder="Enter your email" required>
                         <i class="uil uil-envelope"></i>
@@ -753,7 +756,6 @@
     function submitForm() {    event.preventDefault(); // Add this line to prevent default form submission
       const form = document.getElementById('signupForm');
 form.addEventListener('submit', submitForm);
-
         const formData = {
             username: form.querySelector('[name="username"]').value,
             email: form.querySelector('[name="email"]').value,
