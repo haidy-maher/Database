@@ -122,6 +122,8 @@ app.post('/signup', async (req, res) => {
     }
   });
 
+
+  
   app.post('/createSession', async (req, res) => {
     console.log('Request Body:', req.body);
   
@@ -131,13 +133,7 @@ app.post('/signup', async (req, res) => {
   
     const { topicName, date } = req.body;
   
-    try {
-      const existingSession = await Sessions.findOne({ topicName });
-  
-      if (existingSession) {
-        return res.status(409).json({ error: 'Session already exists' });
-      }
-  
+    try {  
       const newSession = new Sessions({ topicName, date });
       await newSession.save();
   
@@ -147,7 +143,51 @@ app.post('/signup', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
-  
+
+  // Route to get session details by ID
+// Assuming this is your server setup and the Sessions model is defined properly
+
+app.get('/getSession/:id', async (req, res) => {
+  const sessionId = req.params.id;
+
+  try {
+    const session = await Sessions.findById(sessionId);
+
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    res.json(session); // Send the session details as JSON response
+  } catch (error) {
+    console.error('Error fetching session details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
+// Route to handle editing a session by ID
+app.get('/editSession/:id', async (req, res) => {
+  const sessionId = req.params.id;
+
+  try {
+    // Fetch the session details from the database based on the session ID
+    const session = await Sessions.findById(sessionId);
+
+    if (!session) {
+      return res.status(404).send('Session not found');
+    }
+
+    // Render the 'editSession' view and pass the session data to it
+    res.render('editSession', { session });
+  } catch (error) {
+    console.error('Error fetching session:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 
 // Set EJS as the view engine
@@ -176,9 +216,18 @@ app.get('/login', (req, res) => {
 
 
 // FOR ALL PAGES IN NAV
-app.get('/sessions', (req, res) => {
-    res.render('sessions'); // Render the 'sessions.ejs' view
+app.get('/sessions', async (req, res) => {
+  try {
+      const sessions = await Sessions.find(); // Fetch sessions from the database
+
+      res.render('sessions', { sessions }); // Pass fetched sessions to the 'sessions.ejs' view
+  } catch (error) {
+      console.error('Error fetching sessions:', error);
+      res.status(500).send('Internal Server Error');
+  }
 });
+
+
 
 app.get('/createSession', (req, res) => {
     res.render('createSession'); // Render the 'createSession.ejs' view

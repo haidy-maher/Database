@@ -44,33 +44,44 @@
     </div>
 
     <script>
-        const form = document.getElementById('createForm');
+       function submitSessionForm(event) {
+    event.preventDefault(); // Prevent default form submission
+    const form = document.getElementById('createForm');
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+    const formData = {
+        topicName: form.querySelector('[name="topicName"]').value,
+        date: form.querySelector('[name="date"]').value,
+    };
 
-            const formData = {
-                topicName: form.querySelector('[name="topicName"]').value,
-                date: form.querySelector('[name="date"]').value,
-            };
+    fetch('/createSession', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(data => {
+        try {
+            const jsonData = JSON.parse(data);
+            console.log('Success:', jsonData);
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
 
-            fetch('/createSession', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            })
-            .then(response => response.json()) // Parse response as JSON
-            .then(data => {
-                console.log('Success:', data);
-                // Handle success here if needed
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(error);
-            });
-        });
+const form = document.getElementById('createForm');
+form.addEventListener('submit', submitSessionForm);
+
     </script>
 </body>
 </html>

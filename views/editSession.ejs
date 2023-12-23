@@ -24,36 +24,70 @@
 <!-- Main -->
 <div class="main">
 <div class="header">
-  <div class="title"><h3>Create Sessions</h3></div>
+  <div class="title"><h3>Edit Sessions</h3></div>
   
 </div>
 <div class="content">
-
-<form action="post">
-  <div class="form-group">
-    <label for="name">Topic Name</label>
-    <input type="text" id="name" name="name">
-  </div>
+  <form id="editForm" action="/updateSession" method="post">
+    <div class="form-group">
+      <label for="name">Topic Name</label>
+      <input type="text" id="name" name="name">
+    </div>
+    
+    <div class="form-group">
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date">
+    </div>
+    
+    <div class="form-group">
+      <label for="attendance-number">Attendance Number</label>
+      <input type="number" id="attendance-number" name="attendance-number">
+    </div>
   
-  <div class="form-group">
-    <label for="email">Date</label>
-    <input type="Date" id="email" name="email">
+    <div class="input-field button">
+      <input type="submit" value="Update"> <!-- Changed to 'submit' type -->
   </div>
+  </form>
   
-  <div class="form-group">
-    <label for="attendance-number">Attendance Number</label>
-    <input type="number" id="email" name="attendance-number">
-  </div>
-  
-
-  <button type="submit">Update</button>
-</form>
-
 
 
 </div>
 
 </div>
+<script>
+// Function to fetch session details by ID
+async function fetchSessionData(sessionId) {
+  try {
+    const response = await fetch(`/getSession/${sessionId}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Populate form fields with session data
+    document.getElementById('name').value = data.topicName;
+    document.getElementById('date').value = data.date.substring(0, 10); // Extracting the date part
+    document.getElementById('attendance-number').value = data.attendanceNumber;
+  } catch (error) {
+    console.error('Error fetching session data:', error);
+    // Handle error, e.g., show an error message to the user
+  }
+}
+
+// Call fetchSessionData with the session ID from the URL when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  const sessionId = getSessionIdFromURL();
+  fetchSessionData(sessionId);
+});
+
+function getSessionIdFromURL() {
+  const url = window.location.href;
+  const lastSlashIndex = url.lastIndexOf('/');
+  return url.substring(lastSlashIndex + 1);
+}
+
+</script>
 
 </body>
 </html>

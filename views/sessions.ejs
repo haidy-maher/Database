@@ -45,32 +45,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td data-label="Account">1</td>
-      <td data-label="Due Date">Data Types</td>
-      <td data-label="Amount">11/11/2023</td>
-      <td data-label="Amount">35</td>
-      <td data-label="Period"><a href="/editSession"><i class="fa-solid fa-pen-to-square edit-icon"></i></td>
-      <td data-label="Period"><a href="/deleteSession"><i class="fa-solid fa-trash-can delete-icon"></i></td>
-    </tr>
-
-    <tr>
-      <td data-label="Account">1</td>
-      <td data-label="Due Date">Data Types</td>
-      <td data-label="Amount">11/11/2023</td>
-      <td data-label="Amount">35</td>
-      <td data-label="Period"><a href="/editSession"><i class="fa-solid fa-pen-to-square edit-icon"></i></td>
-      <td data-label="Period"><a href="/deleteSession"><i class="fa-solid fa-trash-can delete-icon"></i></td>
-    </tr>
-
-    <tr>
-      <td data-label="Account">1</td>
-      <td data-label="Due Date">Data Types</td>
-      <td data-label="Amount">11/11/2023</td>
-      <td data-label="Amount">35</td>
-      <td data-label="Period"><a href="/editSession"><i class="fa-solid fa-pen-to-square edit-icon"></i></td>
-      <td data-label="Period"><a href="/deleteSession"><i class="fa-solid fa-trash-can delete-icon"></i></td>
-    </tr>
+    <% let counter = 1; %>
+    <% sessions.forEach(session => { %>
+      <tr>
+        <td data-label="ID"><%= counter %></td>
+        <td data-label="Topic Name"><%= session.topicName %></td>
+        <td data-label="Date"><%= session.date.toDateString() %></td>
+        <td data-label="Attendance NO."><%= session.attendanceNumber ? session.attendanceNumber : '---' %></td>
+        <td data-label="Edit"><a href="/editSession/<%= session._id %>"><i class="fa-solid fa-pen-to-square edit-icon"></i></a></td>
+        <td data-label="Delete"><a href="/deleteSession/<%= session._id %>"><i class="fa-solid fa-trash-can delete-icon"></i></a></td>
+      </tr>
+      <% counter++; %>
+    <% }); %>
+    
 
   </tbody>
 </table>
