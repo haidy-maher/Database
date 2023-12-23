@@ -138,7 +138,8 @@ app.post('/createSession', async (req, res) => {
     await newSession.save();
 
     res.redirect('/sessions');
-    res.status(201).json({ message: 'Session created successfully' });
+    // res.status(201).json({ message: 'Session created successfully' });
+    
   } catch (error) {
     console.error('Error creating session:', error);
     res.status(500).json({ error: 'Internal Server Error' });

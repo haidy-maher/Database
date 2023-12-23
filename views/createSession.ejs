@@ -70,18 +70,19 @@
             if (!response.ok) {
               throw new Error('Network response was not ok');
             }
-            return response.text();
+            // Check if the response is a redirect
+            if (response.redirected) {
+              window.location.href = response.url; // Redirect to the URL specified by the server
+            }
+            return response.json(); // Return JSON response from server
           })
           .then(data => {
-            try {
-              const jsonData = JSON.parse(data);
-              console.log('Success:', jsonData);
-            } catch (error) {
-              console.error('Error parsing JSON:', error);
-            }
+            console.log('Success:', data);
+            // Handle success, e.g., show a success message or redirect
           })
           .catch((error) => {
             console.error('Error:', error);
+            // Handle error, e.g., show an error message to the user
           });
       }
 
