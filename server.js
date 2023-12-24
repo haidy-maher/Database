@@ -139,15 +139,26 @@ app.get('/materialDownload/:id', async (req, res) => {
         return res.status(404).send('File not found');
       }
 
-      // Create read stream from GridFS
-      const readStream = gfs.createReadStream(file.filename);
-      readStream.pipe(res);
+      // Check if file is a PDF
+      if (file.contentType === 'application/pdf') {
+        // Set the response headers to force download
+        res.setHeader('Content-disposition', `attachment; filename=${file.filename}`);
+        res.setHeader('Content-type', file.contentType);
+
+        // Create a read stream from GridFS and pipe it to the response
+        const readstream = gfs.createReadStream({ filename: file.filename });
+        readstream.pipe(res);
+      } else {
+        res.status(400).send('File is not a PDF');
+      }
     });
   } catch (error) {
     console.error('Error downloading material:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 
 // Endpoint to upload a file
 app.post('/upload', upload.single('file'), (req, res) => {
@@ -437,3 +448,22 @@ app.get('/addMedia', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
+
+
+
+app.post('/deleteMaterial/:id', async (req, res) => {
+  try {
+    // Extract the ID of the material from the URL parameter
+    const materialId = req.params.id;
+
+    // Find the material by ID and delete it
+    await Material.findByIdAndDelete(materialId);
+
+    // Redirect back to the material page
+    res.redirect('/material');
+  } catch (error) {
+    console.error('Error deleting material:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+

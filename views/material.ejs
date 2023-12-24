@@ -45,6 +45,7 @@
               <th scope="col" style="font-weight: bold;">File</th>
               <th scope="col" style="font-weight: bold;">File Name</th>
               <th scope="col" style="font-weight: bold;">Date Uploaded</th>
+              <th scope="col" style="font-weight: bold;">Delete File</th>
             </tr>
           </thead>
           <tbody>
@@ -53,17 +54,48 @@
                 <td><a href="/materialDownload/<%= material._id %>" style="color: black; font-weight: bold;"><%= material.title %></a></td>
                 <td style="font-weight: bold;"><%= material.title %></td>
                 <td style="font-weight: bold;"><%= material.uploadDate %></td>
+                <td>
+                  <button class="delete-button" style="color: black; font-weight: bold;" data-id="<%= material._id %>">DELETE</button>
+                </td>
               </tr>
             <% }); %>
           </tbody>
+         
         </table>
-        
+
+    
 
       </div>
 
     </div>
     <script>
-      // Function to handle session deletion
+      document.addEventListener('DOMContentLoaded', function () {
+  const deleteButtons = document.querySelectorAll('.delete-button');
+
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function (event) {
+      event.preventDefault();
+      const materialId = this.getAttribute('data-id');
+
+      // Send a POST request to deleteMaterial route
+      fetch(`/deleteMaterial/${materialId}`, {
+        method: 'POST',
+      })
+        .then(response => {
+          if (response.status === 200) {
+            // Reload the page or update the UI as needed
+            window.location.reload(); // Refresh the page in this example
+          } else {
+            console.error('Delete request failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting material:', error);
+        });
+    });
+  });
+});
+
   
     </script>
     
