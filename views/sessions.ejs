@@ -34,8 +34,16 @@
           <h3>Sessions</h3>
         </div>
         <div class="button">
+          <input type="text" id="searchInput" placeholder="Search..." / style="border-radius: 30px; padding: 10px 20px; width: 340px;">
+          <span onclick="performSearch()"><i style="color: rgb(40, 40, 40); position: relative; left: -45px;"
+              class="fa-solid fa-magnifying-glass"></i></span>
+
+        </div>
+        <div class="button">
           <p><a href="/createSession">CREATE <span><i class="fa-solid fa-plus"></i></span></a></p>
         </div>
+
+
       </div>
       <div class="content">
 
@@ -44,8 +52,10 @@
             <tr>
               <th scope="col">ID</th>
               <th scope="col">Topic Name</th>
-              <th scope="col" onclick="sortTable()">Date <span><i class="fa-solid fa-sort-down" id="sortIcon"></i></span> </th>
-              <th scope="col" onclick="sortTableAttendance()">Attendance NO. <span><i class="fa-solid fa-sort-down" id="sortIconAttendance"></i></span> </th>
+              <th scope="col" onclick="sortTable()">Date <span><i class="fa-solid fa-sort-down"
+                    id="sortIcon"></i></span> </th>
+              <th scope="col" onclick="sortTableAttendance()">Attendance NO. <span><i class="fa-solid fa-sort-down"
+                    id="sortIconAttendance"></i></span> </th>
               <th scope="col">Edit</th>
               <th scope="col">Delete</th>
             </tr>
@@ -158,40 +168,59 @@
 
       let sortDescendingAttendance = true;
 
-function sortTableAttendance() {
-  const icon = document.getElementById('sortIconAttendance');
-  const table = document.querySelector('table');
-  const rows = Array.from(table.querySelectorAll('tbody tr'));
+      function sortTableAttendance() {
+        const icon = document.getElementById('sortIconAttendance');
+        const table = document.querySelector('table');
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-  if (sortDescendingAttendance) {
-    icon.classList.remove('fa-sort-down');
-    icon.classList.add('fa-sort-up');
-    // Sort by attendance number in ascending order
-    rows.sort((a, b) => {
-      const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
-      const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
-      return attendanceA - attendanceB;
-    });
-  } else {
-    icon.classList.remove('fa-sort-up');
-    icon.classList.add('fa-sort-down');
-    // Sort by attendance number in descending order
-    rows.sort((a, b) => {
-      const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
-      const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
-      return attendanceB - attendanceA;
-    });
-  }
+        if (sortDescendingAttendance) {
+          icon.classList.remove('fa-sort-down');
+          icon.classList.add('fa-sort-up');
+          // Sort by attendance number in ascending order
+          rows.sort((a, b) => {
+            const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            return attendanceA - attendanceB;
+          });
+        } else {
+          icon.classList.remove('fa-sort-up');
+          icon.classList.add('fa-sort-down');
+          // Sort by attendance number in descending order
+          rows.sort((a, b) => {
+            const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            return attendanceB - attendanceA;
+          });
+        }
 
-  // Reorder the table rows based on the sorted order
-  const tbody = table.querySelector('tbody');
-  tbody.innerHTML = '';
-  rows.forEach(row => {
-    tbody.appendChild(row);
+        // Reorder the table rows based on the sorted order
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+        rows.forEach(row => {
+          tbody.appendChild(row);
+        });
+
+        sortDescendingAttendance = !sortDescendingAttendance; // Toggle the sorting direction for the next click
+      }
+
+
+      // Function to perform case-insensitive search
+// Function to perform case-insensitive search
+function performSearch() {
+  const searchValue = document.getElementById('searchInput').value.toLowerCase(); // Get the search query
+  const tableRows = document.querySelectorAll('tbody tr'); // Select all table rows
+
+  tableRows.forEach(row => {
+    const rowData = row.innerText.toLowerCase(); // Get the row's text content in lowercase
+
+    if (rowData.includes(searchValue)) {
+      row.style.display = ''; // Show the row if it includes the search query
+    } else {
+      row.style.display = 'none'; // Hide the row if it doesn't include the search query
+    }
   });
-
-  sortDescendingAttendance = !sortDescendingAttendance; // Toggle the sorting direction for the next click
 }
+
 
 
     </script>
