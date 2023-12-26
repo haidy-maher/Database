@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: false },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, required: true } // Adding role field with default value
 });
 
 const sessionsSchema = new mongoose.Schema({
@@ -40,6 +41,15 @@ const materialSchema = new mongoose.Schema({
   uploadDate: { type: Date, default: Date.now },
 });
 
+const announcementSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+
+  createdAt: { type: Date, default: Date.now },
+  // Other potential fields: tags, attachments, etc.
+});
+
+const Announcement = mongoose.model('Announcement', announcementSchema);
 const Material = mongoose.model('Material', materialSchema);
 const User = mongoose.model('User', userSchema);
 const Sessions = mongoose.model('Sessions', sessionsSchema);
@@ -206,13 +216,13 @@ app.post('/login', async (req, res) => {
 // Route to handle user signup
 app.post('/signup', async (req, res) => {
   console.log('Request Body:', req.body);
+  
   // Ensure req.body is not undefined and contains required fields
-  if (!req.body || !req.body.username || !req.body.email || !req.body.password) {
+  if (!req.body || !req.body.username || !req.body.email || !req.body.password || !req.body.role) {
     return res.status(400).send('Invalid request body');
-
   }
 
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body; // Set default value for role
 
   try {
     const existingUser = await User.findOne({ username });
@@ -221,8 +231,9 @@ app.post('/signup', async (req, res) => {
       return res.status(409).send('User already exists');
     }
 
-    const newUser = new User({ username, email, password });
+    const newUser = new User({ username, email, password, role });
     await newUser.save();
+
 
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
@@ -274,31 +285,50 @@ app.delete('/deleteSession/:id', async (req, res) => {
   }
 });
 
-
-
-app.post('/updateSession/:id', async (req, res) => {
-  const sessionId = req.params.id;
-
-  const { topicName, date, attendanceNumber } = req.body;
+app.delete('/deleteAnnouncement/:id', async (req, res) => {
+  const announcementId = req.params.id;
 
   try {
-    const session = await Sessions.findByIdAndUpdate(
-      sessionId,
-      { topicName, date, attendanceNumber },
-      { new: true } // Return the updated session
-    );
+    const deletedAnnouncement = await Announcement.findByIdAndDelete(announcementId);
 
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
+    if (!deletedAnnouncement) {
+      return res.status(404).json({ error: 'Announcement not found' });
     }
 
-    // Redirect to /sessions upon successful update
-    res.redirect('/sessions');
+    // Respond with a success message indicating the deletion
+    res.status(200).json({ message: 'Announcement deleted successfully' });
   } catch (error) {
-    console.error('Error updating session:', error);
+    console.error('Error deleting announcement:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+
+app.post('/updateAnnouncement/:id', async (req, res) => {
+  const announcementId = req.params.id;
+
+  const { title, content } = req.body;
+
+  try {
+    const announcement = await Announcement.findByIdAndUpdate(
+      announcementId,
+      { title, content },
+      { new: true } // Return the updated announcement
+    );
+
+    if (!announcement) {
+      return res.status(404).json({ error: 'Announcement not found' });
+    }
+
+    // Redirect to /announcements upon successful update
+    res.redirect('/announcements');
+  } catch (error) {
+    console.error('Error updating announcement:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 // Route to get session details by ID
 // Assuming this is your server setup and the Sessions model is defined properly
@@ -319,6 +349,22 @@ app.get('/getSession/:id', async (req, res) => {
   }
 });
 
+app.get('/getAnnouncement/:id', async (req, res) => {
+  const announcementId = req.params.id;
+
+  try {
+    console.log(announcementId); // Log the announcementId to the server console
+    const announcement = await Announcement.findById(announcementId);
+    if (!announcement) {
+      return res.status(404).json({ error: 'Announcement not found' });
+    }
+
+    res.json(announcement); // Send the announcement details as JSON response
+  } catch (error) {
+    console.error('Error fetching announcement details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
@@ -342,6 +388,24 @@ app.get('/editSession/:id', async (req, res) => {
   }
 });
 
+app.get('/editAnnouncement/:id', async (req, res) => {
+  const announcementId = req.params.id;
+
+  try {
+    // Fetch the announcement details from the database based on the announcement ID
+    const announcement = await Announcement.findById(announcementId);
+
+    if (!announcement) {
+      return res.status(404).send('Announcement not found');
+    }
+
+    // Render the 'editAnnouncement' view and pass the announcement data to it
+    res.render('editAnnouncement', { announcement });
+  } catch (error) {
+    console.error('Error fetching announcement:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 
@@ -383,6 +447,18 @@ app.get('/addmaterial', (req, res) => {
   res.render('addmaterial'); // Render the 'login.ejs' view
 });
 
+app.get('/announcements', async (req, res) => {
+  try {
+    // Fetch data from the "Announcement" collection
+    const announcements = await Announcement.find();
+
+    res.render('announcements', { announcements }); // Pass the data to "announcements.ejs" for rendering
+  } catch (error) {
+    console.error('Error fetching announcements:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 // FOR ALL PAGES IN NAV
 app.get('/sessions', async (req, res) => {
@@ -408,6 +484,32 @@ app.get('/editSession', (req, res) => {
 });
 
 // END
+
+
+// Route to handle editing an announcement by ID
+app.get('/editAnnouncement/:id', async (req, res) => {
+  const announcementId = req.params.id;
+
+  try {
+    // Fetch the announcement details from the database based on the announcement ID
+    const announcement = await Announcement.findById(announcementId);
+
+    if (!announcement) {
+      return res.status(404).send('Announcement not found');
+    }
+
+    // Render the 'editAnnouncement' view and pass the announcement data to it
+    res.render('editAnnouncement', { announcement });
+  } catch (error) {
+    console.error('Error fetching announcement:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/editAnnouncement', (req, res) => {
+  res.render('editAnnouncement'); // Render the 'editAnnouncement.ejs' view
+});
+
 
 
 
@@ -466,4 +568,50 @@ app.post('/deleteMaterial/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+app.post('/createAnnouncement', async (req, res) => {
+  console.log('Request Body:', req.body);
+
+  if (!req.body || !req.body.title || !req.body.content) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  const { title, content } = req.body;
+
+  try {
+    // Assuming 'Announcement' is your Mongoose model for announcements
+    const newAnnouncement = new Announcement({ title, content, createdAt: new Date() });
+    await newAnnouncement.save();
+
+    res.redirect('/announcements');
+    // res.status(201).json({ message: 'Announcement created successfully' });
+    
+  } catch (error) {
+    console.error('Error creating announcement:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// Fetch announcements
+// Fetch announcements
+app.get('/announcements', async (req, res) => {
+  try {
+    const announcements = await Announcement.find();
+    res.render('announcements', { announcements });
+  } catch (error) {
+    console.error('Error fetching announcements:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+// Render the form for creating an announcement
+app.get('/createAnnouncement', (req, res) => {
+  res.render('createAnnouncement'); // Render a form to create an announcement
+});
+
+
+// Create a new announcement
 

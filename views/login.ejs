@@ -727,6 +727,11 @@
                         <i class="uil uil-lock icon"></i>
                         <i class="uil uil-eye-slash showHidePw"></i>
                     </div>
+                    <div class="input-field">
+                      <input type="text" name="role" placeholder="role" value="student" style="opacity: 0;">
+                      <i class="uil uil-lock icon"></i>
+                      <i class="uil uil-eye-slash showHidePw"></i>
+                  </div>
 
 
                     <div class="input-field button">
@@ -758,7 +763,8 @@ form.addEventListener('submit', submitForm);
         const formData = {
             username: form.querySelector('[name="username"]').value,
             email: form.querySelector('[name="email"]').value,
-            password: form.querySelector('[name="password"]').value
+            password: form.querySelector('[name="password"]').value,
+            role: form.querySelector('[name="role"]').value
         };
         fetch('/signup', {
             method: 'POST',

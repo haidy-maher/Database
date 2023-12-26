@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: false },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, required: true } // Adding role field with default value
 });
 
 const sessionsSchema = new mongoose.Schema({
@@ -40,6 +41,15 @@ const materialSchema = new mongoose.Schema({
   uploadDate: { type: Date, default: Date.now },
 });
 
+const announcementSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the User who created the announcement
+  createdAt: { type: Date, default: Date.now },
+  // Other potential fields: tags, attachments, etc.
+});
+
+const Announcement = mongoose.model('Announcement', announcementSchema);
 const Material = mongoose.model('Material', materialSchema);
 const User = mongoose.model('User', userSchema);
 const Sessions = mongoose.model('Sessions', sessionsSchema);
@@ -171,13 +181,13 @@ app.post('/login', async (req, res) => {
 // Route to handle user signup
 app.post('/signup', async (req, res) => {
   console.log('Request Body:', req.body);
+  
   // Ensure req.body is not undefined and contains required fields
-  if (!req.body || !req.body.username || !req.body.email || !req.body.password) {
+  if (!req.body || !req.body.username || !req.body.email || !req.body.password || !req.body.role) {
     return res.status(400).send('Invalid request body');
-
   }
 
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body; // Set default value for role
 
   try {
     const existingUser = await User.findOne({ username });
@@ -186,8 +196,9 @@ app.post('/signup', async (req, res) => {
       return res.status(409).send('User already exists');
     }
 
-    const newUser = new User({ username, email, password });
+    const newUser = new User({ username, email, password, role });
     await newUser.save();
+
 
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
