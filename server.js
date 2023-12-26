@@ -49,6 +49,24 @@ const announcementSchema = new mongoose.Schema({
   // Other potential fields: tags, attachments, etc.
 });
 
+const teamSchema = new mongoose.Schema({
+  teamName: {
+    type: String,
+    required: true,
+  },
+  teamLeader: {
+    type: String,
+    required: true,
+  },
+  members: [{
+    type: String,
+    // You might customize this based on your requirements,
+    // e.g., specifying a maximum number of members per team
+  }],
+  // Add more fields as needed
+});
+
+const Team = mongoose.model('Team', teamSchema);
 const Announcement = mongoose.model('Announcement', announcementSchema);
 const Material = mongoose.model('Material', materialSchema);
 const User = mongoose.model('User', userSchema);
@@ -634,6 +652,164 @@ app.get('/announcements', async (req, res) => {
 // Render the form for creating an announcement
 app.get('/createAnnouncement', (req, res) => {
   res.render('createAnnouncement'); // Render a form to create an announcement
+});
+
+// Assuming you have an Express route to render teams
+app.get('/teams', async (req, res) => {
+  try {
+    // Fetch teams data from your database (replace this with your actual database logic)
+    const teams = await Team.find(); // Assuming you're using Mongoose and have a Team model
+    
+    // Render the 'teams.ejs' view and pass the teams data to it
+    res.render('teams', { teams }); // Assuming 'teams.ejs' is in your views folder
+  } catch (error) {
+    console.error('Error fetching teams:', error);
+    // Handle the error appropriately
+  }
+});
+
+
+// POST create a team
+app.post('/teams', async (req, res) => {
+  const team = new Team({
+    teamName: req.body.teamName,
+    teamLeader: req.body.teamLeader,
+    members: req.body.members,
+    // Add more fields as needed
+  });
+  try {
+    const newTeam = await team.save();
+    res.status(201).json(newTeam);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Express route to render the teams page
+app.get('/teams', async (req, res) => {
+  try {
+    // Fetch teams from MongoDB or any data source
+    const teams = await Team.find(); // Assuming Team is your Mongoose model
+
+    // Pass the teams data to the rendered page
+    res.render('teams', { teams });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/createTeam', async (req, res) => {
+  console.log('Request Body:', req.body);
+
+  if (!req.body || !req.body.teamName || !req.body.teamLeader) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  const { teamName, teamLeader, members } = req.body;
+
+  try {
+    // Assuming 'Team' is your Mongoose model for teams
+    const newTeam = new Team({ teamName, teamLeader, members, createdAt: new Date() });
+    await newTeam.save();
+
+    // Redirect to the '/teams' page after successful creation
+    res.redirect('/teams');
+  } catch (error) {
+    console.error('Error creating team:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Route to fetch and render the edit team page with team details
+app.get('/editTeam/:id', async (req, res) => {
+  const teamId = req.params.id;
+
+  try {
+    // Fetch the team details from the database based on the team ID
+    const team = await Team.findById(teamId);
+
+    if (!team) {
+      return res.status(404).send('Team not found');
+    }
+
+    // Render the 'editTeam' view and pass the team data to it
+    res.render('editTeam', { team });
+  } catch (error) {
+    console.error('Error fetching team:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Route to render a blank form for editing teams (if needed)
+app.get('/editTeam', (req, res) => {
+  res.render('editTeam'); // Render the 'editTeam.ejs' view (empty form)
+});
+
+
+app.post('/updateTeam/:id', async (req, res) => {
+  const teamId = req.params.id;
+  const { teamName, teamLeader, members } = req.body;
+
+  try {
+    // Find and update the team details in the database based on the team ID
+    const team = await Team.findByIdAndUpdate(
+      teamId,
+      { teamName, teamLeader, members },
+      { new: true } // Return the updated team
+    );
+
+    if (!team) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    // Redirect to /teams upon successful update
+    res.redirect('/teams');
+  } catch (error) {
+    console.error('Error updating team:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.delete('/deleteTeam/:id', async (req, res) => {
+  const teamId = req.params.id;
+
+  try {
+    const deletedTeam = await Team.findByIdAndDelete(teamId);
+
+    if (!deletedTeam) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    // Respond with a success message indicating the deletion
+    res.status(200).json({ message: 'Team deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting team:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.get('/getTeam/:id', async (req, res) => {
+  const teamId = req.params.id;
+
+  try {
+    console.log(teamId); // Log the teamId to the server console
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    res.json(team); // Send the team details as a JSON response
+  } catch (error) {
+    console.error('Error fetching team details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/createTeam', (req, res) => {
+  // Render the 'createTeam' view using res.render()
+  res.render('createTeam'); // Replace 'createTeam' with your actual view name
 });
 
 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <!-- CSS LINK -->
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/create-edit.css">
+
+  <!-- Font awesome -->
+  <script src="https://kit.fontawesome.com/6b11d4a153.js" crossorigin="anonymous"></script>
+  <!-- Font -->
+  <!-- FONT 1 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Grandiflora+One&family=Rethink+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Silkscreen&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <%- include('dashboardNav.ejs') %>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="header">
+      <div class="title">
+        <h3>Create Teams</h3>
+      </div>
+    </div>
+    <div class="content">
+      <form id="createForm" action="/createTeam" method="post">
+        <div class="form-group">
+          <label for="teamName">Team Name</label>
+          <input type="text" id="teamName" name="teamName">
+        </div>
+
+        <div class="form-group">
+          <label for="teamLeader">Team Leader</label>
+          <input type="text" id="teamLeader" name="teamLeader">
+        </div>
+
+        <label>Team Members</label>
+        <div id="membersContainer">
+          <!-- Member input fields will be added here -->
+        </div>
+
+        <div class="input-field button" onclick="addMemberInput()" class="button">
+          <input type="button" value="Add Member" style="margin-bottom: 15px; margin-top: 7.5px;">
+        </div>
+
+        <div class="input-field button">
+          <input type="submit" value="Create Team">
+        </div>
+      </form>
+    </div>
+  </div>
+<!-- The rest of your HTML remains the same -->
+
+<script>
+    function submitTeamForm(event) {
+      event.preventDefault(); // Prevent default form submission
+      const form = document.getElementById('createForm');
+  
+      const teamName = form.querySelector('[name="teamName"]').value;
+      const teamLeader = form.querySelector('[name="teamLeader"]').value;
+      const memberInputs = document.querySelectorAll('.member-name-input');
+  
+      // Check if there are no members added
+      if (memberInputs.length === 0) {
+        alert('At least one team member is required!');
+        return; // Stop form submission
+      }
+  
+      const members = Array.from(memberInputs).map(input => input.value.trim());
+  
+      const formData = {
+        teamName,
+        teamLeader,
+        members,
+      };
+  
+      fetch('/createTeam', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        // Check if the response is a redirect
+        if (response.redirected) {
+          window.location.href = response.url; // Redirect to the URL specified by the server
+        }
+        return response.json(); // Return JSON response from server
+      })
+      .then(data => {
+        console.log('Success:', data);
+        // Handle success, e.g., show a success message or redirect
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        // Handle error, e.g., show an error message to the user
+      });
+    }
+  
+    const form = document.getElementById('createForm');
+    form.addEventListener('submit', submitTeamForm);
+  
+    function addMemberInput() {
+    const membersContainer = document.getElementById('membersContainer');
+    const memberInputs = membersContainer.getElementsByClassName('member-input');
+
+    // Check if there are less than three member inputs already
+    if (memberInputs.length < 3) {
+      const memberInput = document.createElement('div');
+      memberInput.classList.add('member-input');
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = 'members[]'; // Use an array-like syntax for form submission
+      input.placeholder = 'Enter member name';
+      input.classList.add('member-name-input');
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.textContent = 'Remove';
+      removeButton.classList.add('remove-member-button');
+      removeButton.onclick = function () {
+        membersContainer.removeChild(memberInput);
+      };
+
+      memberInput.appendChild(input);
+      memberInput.appendChild(removeButton);
+      membersContainer.appendChild(memberInput);
+    } else {
+      alert('Maximum 3 members allowed!');
+    }
+  }
+  </script>
+  
+
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <!-- CSS LINK -->
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/create-edit.css">
+
+  <!-- Font awesome -->
+  <script src="https://kit.fontawesome.com/6b11d4a153.js" crossorigin="anonymous"></script>
+  <!-- Font -->
+  <!-- FONT 1 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Grandiflora+One&family=Rethink+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Silkscreen&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <%- include('dashboardNav.ejs') %>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="header">
+      <div class="title">
+        <h3>Edit Teams</h3>
+      </div>
+    </div>
+    <div class="content">
+      <form id="editForm" action="/updateTeam" method="post">
+        <div class="form-group">
+          <label for="teamName">Team Name</label>
+          <input type="text" id="teamName" name="teamName">
+        </div>
+
+        <div class="form-group">
+          <label for="teamLeader">Team Leader</label>
+          <input type="text" id="teamLeader" name="teamLeader">
+        </div>
+
+        <div class="form-group">
+          <label for="members">Team Members (Separated by commas)</label>
+          <input type="text" id="members" name="members">
+
+        </div>
+        
+
+        <div class="input-field button">
+          <input type="submit" value="Update"> <!-- Changed to 'submit' type -->
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Function to fetch team details by ID
+    async function fetchTeamData(teamId) {
+      try {
+        const response = await fetch(`/getTeam/${teamId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Populate form fields with team data
+        document.getElementById('teamName').value = data.teamName;
+        document.getElementById('teamLeader').value = data.teamLeader;
+        document.getElementById('members').value = data.members.join(', '); // Join members array by commas
+
+      } catch (error) {
+        console.error('Error fetching team data:', error);
+        // Handle error, e.g., show an error message to the user
+      }
+    }
+
+    // Call fetchTeamData with the team ID from the URL when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      const teamId = getTeamIdFromURL();
+      fetchTeamData(teamId);
+    });
+
+    function getTeamIdFromURL() {
+      const url = window.location.href;
+      const lastSlashIndex = url.lastIndexOf('/');
+      return url.substring(lastSlashIndex + 1);
+    }
+
+    // Function to handle form submission
+    function submitTeamForm(event) {
+      event.preventDefault(); // Prevent default form submission
+      const form = document.getElementById('editForm');
+      const teamId = getTeamIdFromURL(); // Get team ID from URL
+
+      const formData = {
+        teamName: form.querySelector('[name="teamName"]').value,
+        teamLeader: form.querySelector('[name="teamLeader"]').value,
+        members: form.querySelector('[name="members"]').value.split(',').map(member => member.trim()), // Split by commas and trim whitespace
+      };
+
+      fetch(`/updateTeam/${teamId}`, { // Include the team ID in the URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          // Check if the response is a redirect
+          if (response.redirected) {
+            window.location.href = response.url; // Redirect to the URL specified by the server
+          }
+          return response.json(); // Return JSON response from server
+        })
+        .then(data => {
+          console.log('Success:', data);
+          // Handle success, e.g., show a success message or redirect
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          // Handle error, e.g., show an error message to the user
+        });
+    }
+
+    const form = document.getElementById('editForm');
+    form.addEventListener('submit', submitTeamForm);
+
+
+    function addMemberInput() {
+    const membersContainer = document.getElementById('membersContainer');
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'members[]'; // Use an array-like syntax for form submission
+    input.placeholder = 'Enter member name';
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.textContent = 'Remove';
+    removeButton.onclick = function () {
+      membersContainer.removeChild(input);
+      membersContainer.removeChild(removeButton);
+    };
+
+    membersContainer.appendChild(input);
+    membersContainer.appendChild(removeButton);
+  }
+
+  </script>
+
+</body>
+
+</html>
