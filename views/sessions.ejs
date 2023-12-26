@@ -130,41 +130,48 @@
       });
 
       let sortDescending = true;
+let lastSortedDate = null; // Track the last sorted date
 
-      function sortTable() {
-        const icon = document.getElementById('sortIcon');
-        const table = document.querySelector('table');
-        const rows = Array.from(table.querySelectorAll('tbody tr'));
+function sortTable() {
+  const icon = document.getElementById('sortIcon');
+  const table = document.querySelector('table');
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-        if (sortDescending) {
-          icon.classList.remove('fa-sort-down');
-          icon.classList.add('fa-sort-up');
-          // Sort by date in ascending order
-          rows.sort((a, b) => {
-            const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
-            const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
-            return dateA - dateB;
-          });
-        } else {
-          icon.classList.remove('fa-sort-up');
-          icon.classList.add('fa-sort-down');
-          // Sort by date in descending order
-          rows.sort((a, b) => {
-            const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
-            const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
-            return dateB - dateA;
-          });
-        }
+  if (lastSortedDate === null) {
+    lastSortedDate = new Date(); // Set initial date for comparison
+  }
 
-        // Reorder the table rows based on the sorted order
-        const tbody = table.querySelector('tbody');
-        tbody.innerHTML = '';
-        rows.forEach(row => {
-          tbody.appendChild(row);
-        });
+  if (sortDescending) {
+    icon.classList.remove('fa-sort-down');
+    icon.classList.add('fa-sort-up');
+    // Sort by date in ascending order (nearest date)
+    rows.sort((a, b) => {
+      const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
+      const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
+      return Math.abs(dateA - lastSortedDate) - Math.abs(dateB - lastSortedDate);
+    });
+  } else {
+    icon.classList.remove('fa-sort-up');
+    icon.classList.add('fa-sort-down');
+    // Sort by date in descending order (farthest date)
+    rows.sort((a, b) => {
+      const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
+      const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
+      return Math.abs(dateB - lastSortedDate) - Math.abs(dateA - lastSortedDate);
+    });
+  }
 
-        sortDescending = !sortDescending; // Toggle the sorting direction for the next click
-      }
+  // Reorder the table rows based on the sorted order
+  const tbody = table.querySelector('tbody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    tbody.appendChild(row);
+  });
+
+  sortDescending = !sortDescending; // Toggle the sorting direction for the next click
+  lastSortedDate = new Date(); // Update the last sorted date for the next comparison
+}
+
 
       let sortDescendingAttendance = true;
 
