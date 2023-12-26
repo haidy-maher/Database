@@ -330,6 +330,30 @@ app.post('/updateAnnouncement/:id', async (req, res) => {
 });
 
 
+app.post('/updateSession/:id', async (req, res) => {
+  const sessionId = req.params.id;
+
+  const { topicName, date, attendanceNumber } = req.body;
+
+  try {
+    const session = await Sessions.findByIdAndUpdate(
+      sessionId,
+      { topicName, date, attendanceNumber },
+      { new: true } // Return the updated session
+    );
+
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    // Redirect to /sessions upon successful update
+    res.redirect('/sessions');
+  } catch (error) {
+    console.error('Error updating session:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Route to get session details by ID
 // Assuming this is your server setup and the Sessions model is defined properly
 

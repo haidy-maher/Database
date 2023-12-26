@@ -44,8 +44,8 @@
             <tr>
               <th scope="col">ID</th>
               <th scope="col">Topic Name</th>
-              <th scope="col">Date</th>
-              <th scope="col">Attendance NO.</th>
+              <th scope="col" onclick="sortTable()">Date <span><i class="fa-solid fa-sort-down" id="sortIcon"></i></span> </th>
+              <th scope="col" onclick="sortTableAttendance()">Attendance NO. <span><i class="fa-solid fa-sort-down" id="sortIconAttendance"></i></span> </th>
               <th scope="col">Edit</th>
               <th scope="col">Delete</th>
             </tr>
@@ -79,7 +79,7 @@
                   <% }); %>
 
           </tbody>
-        </table>  
+        </table>
 
       </div>
 
@@ -107,7 +107,7 @@
             // Handle error, show an error message, or perform necessary actions
           });
       }
-    
+
       // Event listener to handle click on delete icon
       document.addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-icon')) {
@@ -118,8 +118,84 @@
           }
         }
       });
+
+      let sortDescending = true;
+
+      function sortTable() {
+        const icon = document.getElementById('sortIcon');
+        const table = document.querySelector('table');
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+        if (sortDescending) {
+          icon.classList.remove('fa-sort-down');
+          icon.classList.add('fa-sort-up');
+          // Sort by date in ascending order
+          rows.sort((a, b) => {
+            const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
+            const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
+            return dateA - dateB;
+          });
+        } else {
+          icon.classList.remove('fa-sort-up');
+          icon.classList.add('fa-sort-down');
+          // Sort by date in descending order
+          rows.sort((a, b) => {
+            const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
+            const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
+            return dateB - dateA;
+          });
+        }
+
+        // Reorder the table rows based on the sorted order
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+        rows.forEach(row => {
+          tbody.appendChild(row);
+        });
+
+        sortDescending = !sortDescending; // Toggle the sorting direction for the next click
+      }
+
+      let sortDescendingAttendance = true;
+
+function sortTableAttendance() {
+  const icon = document.getElementById('sortIconAttendance');
+  const table = document.querySelector('table');
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+  if (sortDescendingAttendance) {
+    icon.classList.remove('fa-sort-down');
+    icon.classList.add('fa-sort-up');
+    // Sort by attendance number in ascending order
+    rows.sort((a, b) => {
+      const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+      const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+      return attendanceA - attendanceB;
+    });
+  } else {
+    icon.classList.remove('fa-sort-up');
+    icon.classList.add('fa-sort-down');
+    // Sort by attendance number in descending order
+    rows.sort((a, b) => {
+      const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+      const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+      return attendanceB - attendanceA;
+    });
+  }
+
+  // Reorder the table rows based on the sorted order
+  const tbody = table.querySelector('tbody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    tbody.appendChild(row);
+  });
+
+  sortDescendingAttendance = !sortDescendingAttendance; // Toggle the sorting direction for the next click
+}
+
+
     </script>
-    
+
 
 </body>
 
