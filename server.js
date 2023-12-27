@@ -9,6 +9,15 @@ app.use(express.json());
 // MongoDB connection URI and database name
 const uri = 'mongodb://localhost:27017';
 const dbName = 'MCPC';
+const session = require('express-session');
+const { Readable } = require('stream');
+
+app.use(session({
+  secret: 'myseceret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set secure to true if using https
+}));
 
 // Connect to MongoDB using Mongoose
 mongoose.connect(`${uri}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -29,9 +38,10 @@ const sessionsSchema = new mongoose.Schema({
 
 const mediaSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: String,
   fileType: { type: String, required: true },
-  uploadDate: { type: Date, default: Date.now },
+  mediaType: { type: String, enum: ['image', 'video'] },
+  data: { type: Buffer, required: true }, // Add this line
+  contentType: { type: String, required: true } // Add this line
 });
 
 const materialSchema = new mongoose.Schema({
@@ -119,27 +129,48 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static('public'));
 
-
 app.post('/mediaUpload', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded');
   }
 
-  const { originalname, mimetype, buffer } = req.file;
+  // Extracting file extension for fileType
+  const fileExtension = req.file.originalname.split('.').pop();
 
-
-
-  // Save file details in Material collection
   const newMedia = new Media({
-    title: originalname,
-    fileType: mimetype
+    title: req.file.originalname,
+    fileType: fileExtension, // Set the fileType here
+    data: req.file.buffer,
+    contentType: req.file.mimetype,
+    mediaType: 'image' // You may want to set this dynamically based on the file type
   });
-  
 
-  
   await newMedia.save();
   res.redirect('/media');
+});
 
+app.post('/deleteMedia/:mediaId', async (req, res) => {
+  const mediaId = req.params.mediaId;
+
+  try {
+      await Media.findByIdAndDelete(mediaId);
+      res.status(200).send('Media deleted successfully');
+  } catch (error) {
+      console.error('Error deleting media:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+app.post('/editMedia/:mediaId', async (req, res) => {
+  const mediaId = req.params.mediaId;
+  const updates = req.body; // Assuming updates are sent in the request body
+
+  try {
+      const media = await Media.findByIdAndUpdate(mediaId, updates, { new: true });
+      res.status(200).json(media);
+  } catch (error) {
+      console.error('Error updating media:', error);
+      res.status(500).send('Internal Server Error');
+  }
 });
 
 
@@ -236,9 +267,20 @@ app.post('/upload', upload.single('file'), (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = await User.findOne({ username, password }); // Find user by username and password
+    const user = await User.findOne({ username, password });
     if (user) {
-      res.redirect('/sessions');
+      // Create session
+      req.session.userId = user._id;
+
+      // Redirect based on user role
+      if (user.role === 'student') {
+        res.redirect('/sessions');
+      } else if (user.role === 'admin') {
+        res.redirect('/session2');
+      } else {
+        // Redirect to a default page or handle other roles
+        res.redirect('/defaultPage');
+      }
     } else {
       res.status(401).send('Invalid credentials');
     }
@@ -246,6 +288,8 @@ app.post('/login', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+
 
 // Route to handle user signup
 app.post('/signup', async (req, res) => {
@@ -572,6 +616,33 @@ app.get('/editAnnouncement', (req, res) => {
 
 
 
+
+app.get('/mediaDownload/:id', async (req, res) => {
+  try {
+    const mediaId = req.params.id;
+    const media = await Media.findById(mediaId);
+
+    if (!media) {
+      return res.status(404).send('Media not found');
+    }
+
+    // Set the correct headers for the file
+    res.setHeader('Content-disposition', 'attachment; filename=' + media.title);
+    res.setHeader('Content-type', media.contentType);
+
+    // Convert the Buffer back to a readable stream
+    const readStream = new Readable();
+    readStream.push(media.data);
+    readStream.push(null); // Indicate the end of the stream
+
+    // Pipe the read stream to the response
+    readStream.pipe(res);
+  } catch (error) {
+    console.error('Error downloading media:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // media
 
 const MediaSchema = new mongoose.Schema({
@@ -626,7 +697,21 @@ app.post('/deleteMaterial/:id', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+app.post('/deleteMedia/:id', async (req, res) => {
+  try {
+    // Extract the ID of the material from the URL parameter
+    const materialId = req.params.id;
 
+    // Find the material by ID and delete it
+    await Material.findByIdAndDelete(materialId);
+
+    // Redirect back to the material page
+    res.redirect('/material');
+  } catch (error) {
+    console.error('Error deleting material:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 app.post('/createAnnouncement', async (req, res) => {
   console.log('Request Body:', req.body);

@@ -753,7 +753,6 @@
     </div>
     <!-- Include your JavaScript file -->
     <script src="/js/signin.js"></script>
-
 <script>
     function submitForm() {    event.preventDefault(); // Add this line to prevent default form submission
       const form = document.getElementById('signupForm');
@@ -803,14 +802,12 @@ form.addEventListener('submit', submitForm);
         body: JSON.stringify(formData),
     })
     .then(response => {
-       
         if (response.status === 200) {
             window.location.href = '/sessions'; 
           } else {
             console.error('Delete request failed');
             window.location.reload();
             alert("Wrong Username or Password");
-
           }
     })
     .then(data => {
