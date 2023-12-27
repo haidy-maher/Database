@@ -787,36 +787,42 @@ form.addEventListener('submit', submitForm);
         });
     }
     function submitForm2() {
-    event.preventDefault();
-    const form = document.getElementById('loginform');
-    const formData = {
-        username: form.querySelector('[name="username"]').value,
-        password: form.querySelector('[name="password"]').value,
-    };
-    
-    fetch('/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-    })
-    .then(response => {
-        if (response.status === 200) {
-            window.location.href = '/sessions'; 
-          } else {
-            console.error('Delete request failed');
-            window.location.reload();
-            alert("Wrong Username or Password");
-          }
-    })
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+  event.preventDefault();
+  const form = document.getElementById('loginform');
+  const formData = {
+      username: form.querySelector('[name="username"]').value,
+      password: form.querySelector('[name="password"]').value,
+  };
+  
+  fetch('/login', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json(); // Expecting a JSON response
+    } else {
+      throw new Error('Invalid credentials');
+    }
+  })
+  .then(data => {
+    // Redirect based on the user role
+    if (data.role === 'student') {
+      window.location.href = '/studentSessions';
+    } else if (data.role === 'admin') {
+      window.location.href = '/session';
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    alert("Wrong Username or Password");
+    window.location.reload();
+  });
 }
+
 
 </script>
 </body>

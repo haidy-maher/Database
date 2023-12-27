@@ -272,15 +272,8 @@ app.post('/login', async (req, res) => {
       // Create session
       req.session.userId = user._id;
 
-      // Redirect based on user role
-      if (user.role === 'student') {
-        res.redirect('/sessions');
-      } else if (user.role === 'admin') {
-        res.redirect('/session2');
-      } else {
-        // Redirect to a default page or handle other roles
-        res.redirect('/defaultPage');
-      }
+      // Send the user role in the response
+      res.json({ role: user.role });
     } else {
       res.status(401).send('Invalid credentials');
     }
@@ -288,6 +281,7 @@ app.post('/login', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
 
 
 
