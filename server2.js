@@ -1015,6 +1015,22 @@ app.get('/students', async (req, res) => {
     }
   });
   
-  app.get('/    ', (req, res) => {
+  app.get('/studentAnnouncements', (req, res) => {
     res.render('studentAnnouncements', { Announcement });
+  });
+
+
+  app.get('/studentSessions', async (req, res) => {
+    try {
+      const sessions = await Sessions.find(); // Fetch sessions from the database
+  
+      res.render('studentSessions', { sessions }); // Pass fetched sessions to the 'sessions.ejs' view
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+  app.get('/studentSessions', (req, res) => {
+    res.render('studentSessions', { Sessions });
   });
