@@ -724,6 +724,7 @@ app.get('/teams', async (req, res) => {
   }
 });
 
+
 app.post('/createTeam', async (req, res) => {
   console.log('Request Body:', req.body);
 
@@ -841,9 +842,8 @@ app.get('/createTeam', (req, res) => {
 
 //Team End
 
-app.get('/students', (req, res) => {
-    res.render('students', { Student });
-  });
+
+
 
   app.get('/profile', (req, res) => {
     res.render('profile', { Student });
@@ -925,5 +925,55 @@ app.get('/students', (req, res) => {
     } catch (error) {
       console.error('Error updating profile:', error);
       res.status(500).send('Internal Server Error');
+    }
+  });
+
+
+  ///students
+
+
+// Assuming a route to fetch students
+app.get('/students', async (req, res) => {
+    try {
+      // Fetch data from the database
+      const students = await Student.find(); // Fetches all students
+  
+      // Render the 'students.ejs' file and pass the retrieved data
+      res.render('students', { students: students });
+    } catch (err) {
+      // Handle errors appropriately
+      res.status(500).send('Error fetching students');
+    }
+  });
+  
+  app.get('/getStudent/:id', async (req, res) => {
+    const studentId = req.params.id;
+  
+    try {
+      console.log(studentId); // Log the studentId to the server console
+      const student = await Student.findById(studentId);
+      if (!student) {
+        return res.status(404).json({ error: 'Student not found' });
+      }
+  
+      // Extract the skills and send them as a JSON response
+      const { skills } = student;
+      res.json({ skills });
+    } catch (error) {
+      console.error('Error fetching student skills:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+
+  app.get('/students', async (req, res) => {
+    try {
+      // Fetch teams from MongoDB or any data source
+      const students = await Student.find(); // Assuming Team is your Mongoose model
+  
+      // Pass the teams data to the rendered page
+      res.render('students ', { students });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
   });
