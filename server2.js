@@ -511,6 +511,8 @@ app.get('/material', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 app.get('/addmaterial', (req, res) => {
   res.render('addmaterial'); // Render the 'login.ejs' view
 });
@@ -542,6 +544,9 @@ app.get('/sessions', async (req, res) => {
 
 
 
+app.get('/createSession', (req, res) => {
+    res.render('createSession'); // Render the 'createSession.ejs' view
+  });
 
 app.get('/createSession', (req, res) => {
   res.render('createSession'); // Render the 'createSession.ejs' view
@@ -976,4 +981,23 @@ app.get('/students', async (req, res) => {
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
+  });
+
+
+
+  app.get('/studentMaterial', async (req, res) => {
+    try {
+      // Fetch data from the "Material" collection
+      const materials = await Material.find();
+  
+      res.render('studentMaterial', { materials }); // Pass the data to "material.ejs" for rendering
+    } catch (error) {
+      console.error('Error fetching materials:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+
+  app.get('/studentMaterial', (req, res) => {
+    res.render('studentMaterial', { Student });
   });
