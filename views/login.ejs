@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
     <link rel="stylesheet" href="../css/login.css">
     <!-- Include the web particles script and its dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.5.0/webcomponents-loader.js"></script>
@@ -672,20 +672,20 @@
         <div class="forms">
             <div class="form login">
                 <span class="title">Login</span>  
-                <form action="/login" method="POST" enctype="application/json" id="loginform" onsubmit="submitForm()">
+                <form action="/login" method="POST" enctype="application/json" id="loginform" onsubmit="submitForm2()">
 
  
-                    <div class="input-field">
-                        <input type="text" placeholder="Enter your email" required>
-                        <i class="uil uil-envelope"></i>
-                    </div>
-
-                    <div class="input-field">
-                        <input type="password" class="password" placeholder="Enter your password" required>
-                        <i class="uil uil-lock icon"></i>
-                        <i class="uil uil-eye-slash showHidePw"></i>
-                    </div>
-
+                  
+                  <div class="input-field">
+                    <input type="text" name="username" placeholder="Enter yourr name" required>
+                    <i class="uil uil-user"></i>
+                </div>
+             
+                <div class="input-field">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <i class="uil uil-lock icon"></i>
+                    <i class="uil uil-eye-slash showHidePw"></i>
+                </div>
                     <div class="checkbox-text">
                         <div class="checkbox-content">
                             <input type="checkbox" id="logCheck">
@@ -696,13 +696,13 @@
                     </div>
 
                     <div class="input-field button">
-                        <input type="button" value="Login Now">
-                    </div>
+                      <input type="submit" value="Login">
+                  </div>
                 </form>
 
                 <div class="login-signup">
                     <span class="text">Not a member?
-                        <a href="#" class="text signup-link">Signup now</a>
+                        <a href="#" class="text signup-link">Signup Now</a>
                     </span>
                 </div>
             </div>
@@ -732,8 +732,6 @@
                       <i class="uil uil-lock icon"></i>
                       <i class="uil uil-eye-slash showHidePw"></i>
                   </div>
-
-
                     <div class="input-field button">
                         <input type="submit" value="Register Now">
                     </div>
@@ -789,6 +787,40 @@ form.addEventListener('submit', submitForm);
             console.error('Error:', error);
         });
     }
+    function submitForm2() {
+    event.preventDefault();
+    const form = document.getElementById('loginform');
+    const formData = {
+        username: form.querySelector('[name="username"]').value,
+        password: form.querySelector('[name="password"]').value,
+    };
+    
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => {
+       
+        if (response.status === 200) {
+            window.location.href = '/sessions'; 
+          } else {
+            console.error('Delete request failed');
+            window.location.reload();
+            alert("Wrong Username or Password");
+
+          }
+    })
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
 </script>
 </body>
 </html>

@@ -232,28 +232,18 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.json({ success: true, file: req.file });
   });
 });
-// Route to handle user login
+
 app.post('/login', async (req, res) => {
-  // Ensure req.body is not undefined and contains required fields
-  if (!req.body || !req.body.email || !req.body.password) {
-    return res.status(400).send('Invalid request body');
-  }
-
-  const { email, password } = req.body;
-
+  const { username, password } = req.body;
   try {
-    const user = await User.findOne({ email, password });
-
-    if (!user) {
-      return res.status(401).send('Invalid email or password');
+    const user = await User.findOne({ username, password }); // Find user by username and password
+    if (user) {
+      res.redirect('/sessions');
+    } else {
+      res.status(401).send('Invalid credentials');
     }
-
-    // You might want to implement a session or token mechanism for authentication
-    // For simplicity, just sending a success message for now
-    res.status(200).send('Login successful');
   } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send('Server error');
   }
 });
 
