@@ -1001,3 +1001,20 @@ app.get('/students', async (req, res) => {
   app.get('/studentMaterial', (req, res) => {
     res.render('studentMaterial', { Student });
   });
+
+
+  app.get('/studentAnnouncements', async (req, res) => {
+    try {
+      // Fetch data from the "Announcement" collection
+      const announcements = await Announcement.find();
+  
+      res.render('studentAnnouncements', { announcements }); // Pass the data to "announcements.ejs" for rendering
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+  app.get('/    ', (req, res) => {
+    res.render('studentAnnouncements', { Announcement });
+  });
