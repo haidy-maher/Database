@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <!-- CSS LINK -->
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/tables.css">
+
+  <!-- Font awesome -->
+  <script src="https://kit.fontawesome.com/6b11d4a153.js" crossorigin="anonymous"></script>
+  <!-- Font -->
+  <!-- FONT 1 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Grandiflora+One&family=Rethink+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Silkscreen&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+
+  <%- include('studentNav.ejs') %>
+
+
+
+    <!-- Main -->
+    <div class="main">
+      <div class="header">
+        <div class="title">
+          <h3>Sessions</h3>
+        </div>
+        <div class="button">
+          <input type="text" id="searchInput" placeholder="Search..." / style="border-radius: 30px; padding: 10px 20px; width: 340px;">
+          <span onclick="performSearch()"><i style="color: rgb(40, 40, 40); position: relative; left: -45px;"
+              class="fa-solid fa-magnifying-glass"></i></span>
+
+        </div>
+       
+
+      </div>
+      <div class="content">
+
+        <table>
+          <thead id="header">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Topic Name</th>
+              <th scope="col" onclick="sortTable()">Date <span><i class="fa-solid fa-sort-down"
+                    id="sortIcon"></i></span> </th>
+              <th scope="col" onclick="sortTableAttendance()">Attendance NO. <span><i class="fa-solid fa-sort-down"
+                    id="sortIconAttendance"></i></span> </th>
+             
+            </tr>
+          </thead>
+          <tbody>
+            <% let counter=1; %>
+              <% sessions.forEach(session=> { %>
+                <tr>
+                  <td data-label="ID">
+                    <%= counter %>
+                  </td>
+                  <td data-label="Topic Name">
+                    <%= session.topicName %>
+                  </td>
+                  <td data-label="Date">
+                    <%= session.date.toDateString() %>
+                  </td>
+                  <td data-label="Attendance NO.">
+                    <%= session.attendanceNumber ? session.attendanceNumber : '---' %>
+                  </td>
+                  
+
+                </tr>
+                <% counter++; %>
+                  <% }); %>
+
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+    <script>
+    
+
+    
+
+      let sortDescending = true;
+let lastSortedDate = null; // Track the last sorted date
+
+function sortTable() {
+  const icon = document.getElementById('sortIcon');
+  const table = document.querySelector('table');
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+  if (lastSortedDate === null) {
+    lastSortedDate = new Date(); // Set initial date for comparison
+  }
+
+  if (sortDescending) {
+    icon.classList.remove('fa-sort-down');
+    icon.classList.add('fa-sort-up');
+    // Sort by date in ascending order (nearest date)
+    rows.sort((a, b) => {
+      const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
+      const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
+      return Math.abs(dateA - lastSortedDate) - Math.abs(dateB - lastSortedDate);
+    });
+  } else {
+    icon.classList.remove('fa-sort-up');
+    icon.classList.add('fa-sort-down');
+    // Sort by date in descending order (farthest date)
+    rows.sort((a, b) => {
+      const dateA = new Date(a.querySelector('[data-label="Date"]').textContent);
+      const dateB = new Date(b.querySelector('[data-label="Date"]').textContent);
+      return Math.abs(dateB - lastSortedDate) - Math.abs(dateA - lastSortedDate);
+    });
+  }
+
+  // Reorder the table rows based on the sorted order
+  const tbody = table.querySelector('tbody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    tbody.appendChild(row);
+  });
+
+  sortDescending = !sortDescending; // Toggle the sorting direction for the next click
+  lastSortedDate = new Date(); // Update the last sorted date for the next comparison
+}
+
+
+      let sortDescendingAttendance = true;
+
+      function sortTableAttendance() {
+        const icon = document.getElementById('sortIconAttendance');
+        const table = document.querySelector('table');
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+        if (sortDescendingAttendance) {
+          icon.classList.remove('fa-sort-down');
+          icon.classList.add('fa-sort-up');
+          // Sort by attendance number in ascending order
+          rows.sort((a, b) => {
+            const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            return attendanceA - attendanceB;
+          });
+        } else {
+          icon.classList.remove('fa-sort-up');
+          icon.classList.add('fa-sort-down');
+          // Sort by attendance number in descending order
+          rows.sort((a, b) => {
+            const attendanceA = parseInt(a.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            const attendanceB = parseInt(b.querySelector('[data-label="Attendance NO."]').textContent) || 0;
+            return attendanceB - attendanceA;
+          });
+        }
+
+        // Reorder the table rows based on the sorted order
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+        rows.forEach(row => {
+          tbody.appendChild(row);
+        });
+
+        sortDescendingAttendance = !sortDescendingAttendance; // Toggle the sorting direction for the next click
+      }
+
+
+      // Function to perform case-insensitive search
+// Function to perform case-insensitive search
+function performSearch() {
+  const searchValue = document.getElementById('searchInput').value.toLowerCase(); // Get the search query
+  const tableRows = document.querySelectorAll('tbody tr'); // Select all table rows
+
+  tableRows.forEach(row => {
+    const rowData = row.innerText.toLowerCase(); // Get the row's text content in lowercase
+
+    if (rowData.includes(searchValue)) {
+      row.style.display = ''; // Show the row if it includes the search query
+    } else {
+      row.style.display = 'none'; // Hide the row if it doesn't include the search query
+    }
+  });
+}
+
+
+
+    </script>
+
+
+</body>
+
+</html>

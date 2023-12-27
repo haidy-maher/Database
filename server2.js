@@ -511,6 +511,8 @@ app.get('/material', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 app.get('/addmaterial', (req, res) => {
   res.render('addmaterial'); // Render the 'login.ejs' view
 });
@@ -542,6 +544,9 @@ app.get('/sessions', async (req, res) => {
 
 
 
+app.get('/createSession', (req, res) => {
+    res.render('createSession'); // Render the 'createSession.ejs' view
+  });
 
 app.get('/createSession', (req, res) => {
   res.render('createSession'); // Render the 'createSession.ejs' view
@@ -724,6 +729,7 @@ app.get('/teams', async (req, res) => {
   }
 });
 
+
 app.post('/createTeam', async (req, res) => {
   console.log('Request Body:', req.body);
 
@@ -841,9 +847,8 @@ app.get('/createTeam', (req, res) => {
 
 //Team End
 
-app.get('/students', (req, res) => {
-    res.render('students', { Student });
-  });
+
+
 
   app.get('/profile', (req, res) => {
     res.render('profile', { Student });
@@ -926,4 +931,106 @@ app.get('/students', (req, res) => {
       console.error('Error updating profile:', error);
       res.status(500).send('Internal Server Error');
     }
+  });
+
+
+  ///students
+
+
+// Assuming a route to fetch students
+app.get('/students', async (req, res) => {
+    try {
+      // Fetch data from the database
+      const students = await Student.find(); // Fetches all students
+  
+      // Render the 'students.ejs' file and pass the retrieved data
+      res.render('students', { students: students });
+    } catch (err) {
+      // Handle errors appropriately
+      res.status(500).send('Error fetching students');
+    }
+  });
+  
+  app.get('/getStudent/:id', async (req, res) => {
+    const studentId = req.params.id;
+  
+    try {
+      console.log(studentId); // Log the studentId to the server console
+      const student = await Student.findById(studentId);
+      if (!student) {
+        return res.status(404).json({ error: 'Student not found' });
+      }
+  
+      // Extract the skills and send them as a JSON response
+      const { skills } = student;
+      res.json({ skills });
+    } catch (error) {
+      console.error('Error fetching student skills:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+
+  app.get('/students', async (req, res) => {
+    try {
+      // Fetch teams from MongoDB or any data source
+      const students = await Student.find(); // Assuming Team is your Mongoose model
+  
+      // Pass the teams data to the rendered page
+      res.render('students ', { students });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+
+
+  app.get('/studentMaterial', async (req, res) => {
+    try {
+      // Fetch data from the "Material" collection
+      const materials = await Material.find();
+  
+      res.render('studentMaterial', { materials }); // Pass the data to "material.ejs" for rendering
+    } catch (error) {
+      console.error('Error fetching materials:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+
+  app.get('/studentMaterial', (req, res) => {
+    res.render('studentMaterial', { Student });
+  });
+
+
+  app.get('/studentAnnouncements', async (req, res) => {
+    try {
+      // Fetch data from the "Announcement" collection
+      const announcements = await Announcement.find();
+  
+      res.render('studentAnnouncements', { announcements }); // Pass the data to "announcements.ejs" for rendering
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+  app.get('/studentAnnouncements', (req, res) => {
+    res.render('studentAnnouncements', { Announcement });
+  });
+
+
+  app.get('/studentSessions', async (req, res) => {
+    try {
+      const sessions = await Sessions.find(); // Fetch sessions from the database
+  
+      res.render('studentSessions', { sessions }); // Pass fetched sessions to the 'sessions.ejs' view
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+  app.get('/studentSessions', (req, res) => {
+    res.render('studentSessions', { Sessions });
   });
