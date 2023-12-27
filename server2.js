@@ -905,3 +905,25 @@ app.get('/students', (req, res) => {
     }
   });
   
+
+  app.post('/updateProfile', async (req, res) => {
+    // Retrieve profile ID from the session
+    let profileId = '658c700b1f4acc92cb76031f';
+  
+    if (!profileId) {
+      return res.status(401).send('No profile ID in session');
+    }
+  
+    const updatedData = req.body; // Data from the client
+  
+    try {
+      // Update the profile in the database
+      await Student.findByIdAndUpdate(profileId, updatedData, { new: true });
+  
+      // Send a success response or redirect
+      res.json({ message: 'Profile updated successfully' });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });

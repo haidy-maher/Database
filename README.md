@@ -9,6 +9,6 @@ contests => (Ashraf)
 students => (Haidy)
 
 
-Login & Sign up => (Ashraf)
+Login & Sign up, Media, Contests => (Ashraf)
 
 
