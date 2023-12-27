@@ -92,30 +92,31 @@
         <div class="main">
             <div class="header">
                 <div class="title">
-                    <h3>Create Sessions</h3>
+                    <h3>Profile</h3>
                 </div>
             </div>
 
             <div class="container">
+                <form method="POST" id="profileForm">
                 <button type="button" class="collapsible">General Info</button>
-                <div class="contentt">
+                    <div class="contentt">
 
-                    <div class="form-group">
-                        <label for="uniID">University ID</label>
-                        <input type="text" id="uniID" name="uniID">
+                        <div class="form-group">
+                            <label for="uniID">University ID</label>
+                            <input type="text" id="uniID" name="uniID">
+                        </div>
+                        <div class="form-group">
+                            <label for="level">Level</label>
+                            <input type="text" id="level" name="level">
+                        </div>
+                        <div class="form-group">
+                            <label for="gpa">GPA</label>
+                            <input type="number" id="gpa" name="gpa">
+                        </div>
+                        <div class="input-field button">
+                            <input type="submit" value="Update" id="updateProfileButton" >
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="level">Level</label>
-                        <input type="text" id="level" name="level">
-                    </div>
-                    <div class="form-group">
-                        <label for="gpa">GPA</label>
-                        <input type="number" id="gpa" name="gpa">
-                    </div>
-                    <div class="input-field button">
-                        <input type="submit" value="Register Now">
-                    </div>
-                </div>
 
                 <button type="button" class="collapsible">Skills</button>
                 <div class="contentt">
@@ -133,30 +134,8 @@
                     </div>
 
 
-
-                    <div class="form-group">
-                        <label for="dpKnown">DP</label>
-                        <input type="radio" id="dpKnown" name="dpKnown" value="true"> Yes
-                        <input type="radio" id="dpNotKnown" name="dpKnown" value="false"> No
-                    </div>
-                    <div class="form-group">
-                        <label for="greedyKnown">Greedy</label>
-                        <input type="radio" id="greedyKnown" name="greedyKnown" value="true"> Yes
-                        <input type="radio" id="greedyNotKnown" name="greedyKnown" value="false"> No
-                    </div>
-                    <div class="form-group">
-                        <label for="divideConquerKnown">Divide and conquer</label>
-                        <input type="radio" id="divideConquerKnown" name="divideConquerKnown" value="true"> Yes
-                        <input type="radio" id="divideConquerNotKnown" name="divideConquerKnown" value="false"> No
-                    </div>
-                    <div class="form-group">
-                        <label for="bruteForceKnown">Brute force</label>
-                        <input type="radio" id="bruteForceKnown" name="bruteForceKnown" value="true"> Yes
-                        <input type="radio" id="bruteForceNotKnown" name="bruteForceKnown" value="false"> No
-                    </div>
-
                     <div class="input-field button">
-                        <input type="submit" value="Register Now">
+                        <input type="submit" value="Update" id="updateProfileButton" >
                     </div>
                 </div>
 
@@ -176,10 +155,11 @@
                     </div>
 
                     <div class="input-field button">
-                        <input type="submit" value="Register Now">
+                        <input type="submit" value="Update" id="updateProfileButton" >
                     </div>
                 </div>
             </div>
+        </form>
 
 </body>
 
@@ -206,24 +186,16 @@
             document.getElementById('vjudgeUsername').value = data.contactInfo.vjudgeUsername || '';
             document.getElementById('phoneNumber').value = data.contactInfo.phoneNumber || '';
             document.getElementById('account').value = data.contactInfo.account || '';
-            document.getElementById('cRange').value = data.programmingLanguages.C || '';
-            document.getElementById('cppRange').value = data.programmingLanguages.Cpp || '';
-            document.getElementById('pythonRange').value = data.programmingLanguages.Python || '';
-
-            document.getElementById('dpKnown').checked = data.algorithmKnown.DP === 'true';
-            document.getElementById('dpNotKnown').checked = data.algorithmKnown.DP === 'false';
-
-            document.getElementById('greedyKnown').checked = data.algorithmKnown.Greedy === 'true';
-            document.getElementById('greedyNotKnown').checked = data.algorithmKnown.Greedy === 'false';
-
-            document.getElementById('divideConquerKnown').checked = data.algorithmKnown['Divide and conquer'] === 'true';
-            document.getElementById('divideConquerNotKnown').checked = data.algorithmKnown['Divide and conquer'] === 'false';
-
-            document.getElementById('bruteForceKnown').checked = data.algorithmKnown['Brute force'] === 'true';
-            document.getElementById('bruteForceNotKnown').checked = data.algorithmKnown['Brute force'] === 'false';
 
 
 
+
+            document.getElementById('cRange').value = data.skills.cProgramming || 1;
+            document.getElementById('cppRange').value = data.skills.cppProgramming || 1;
+            document.getElementById('pythonRange').value = data.skills.pythonProgramming || 1;
+
+
+     
         } catch (error) {
             console.error('Error fetching profile data:', error);
             // Handle error, e.g., show an error message to the user
@@ -253,7 +225,92 @@
             });
         }
     });
+
+
+
+//////////////////////
+
+
+// Function to handle profile form submission
+function submitProfileForm(event) {
+  event.preventDefault(); // Prevent default form submission
+  const form = document.getElementById('profileForm');
+
+const formData = {
+  generalInfo: {
+    universityID: form.querySelector('[name="uniID"]').value,
+    level: form.querySelector('[name="level"]').value,
+    GPA: form.querySelector('[name="gpa"]').value,
+  },
+  skills: {
+    cProgramming: form.querySelector('[name="cRange"]').value,
+    cppProgramming: form.querySelector('[name="cppRange"]').value,
+    pythonProgramming: form.querySelector('[name="pythonRange"]').value,
+  },
+  contact: {
+    vjudgeUsername: form.querySelector('[name="vjudgeUsername"]').value,
+    phoneNumber: form.querySelector('[name="phoneNumber"]').value,
+    account: form.querySelector('[name="account"]').value,
+  }
+};
+
+
+  fetch('/updateProfile', { // Endpoint to handle profile updates
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    // Check if the response is a redirect
+    if (response.redirected) {
+      window.location.href = response.url; // Redirect to the URL specified by the server
+    }
+    return response.json(); // Return JSON response from server
+  })
+  .then(data => {
+    console.log('Success:', data);
+    // Handle success, e.g., show a success message or redirect
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    // Handle error, e.g., show an error message to the user
+  });
+}
+
+const form = document.getElementById('profileForm'); // Replace with your actual form ID
+form.addEventListener('submit', submitProfileForm);
+
+
 </script>
 
 
 </html>
+
+
+
+<!-- 
+                    <div class="form-group">
+                        <label for="dpKnown">DP</label>
+                        <input type="radio" id="dpKnown" name="dpKnown" value="true"> Yes
+                        <input type="radio" id="dpNotKnown" name="dpKnown" value="false"> No
+                    </div>
+                    <div class="form-group">
+                        <label for="greedyKnown">Greedy</label>
+                        <input type="radio" id="greedyKnown" name="greedyKnown" value="true"> Yes
+                        <input type="radio" id="greedyNotKnown" name="greedyKnown" value="false"> No
+                    </div>
+                    <div class="form-group">
+                        <label for="divideConquerKnown">Divide and conquer</label>
+                        <input type="radio" id="divideConquerKnown" name="divideConquerKnown" value="true"> Yes
+                        <input type="radio" id="divideConquerNotKnown" name="divideConquerKnown" value="false"> No
+                    </div>
+                    <div class="form-group">
+                        <label for="bruteForceKnown">Brute force</label>
+                        <input type="radio" id="bruteForceKnown" name="bruteForceKnown" value="true"> Yes
+                        <input type="radio" id="bruteForceNotKnown" name="bruteForceKnown" value="false"> No
+                    </div> -->
