@@ -66,30 +66,30 @@ const teamSchema = new mongoose.Schema({
   // Add more fields as needed
 });
 
-
 const studentSchema = new mongoose.Schema({
-  generalInfo: {
-    studentId: { type: String, required: true },
-    universityID: { type: String, required: true },
-    level: { type: String },
-    GPA: { type: Number }
-  },
-  skills: {
-    programmingLanguages: [{
-      language: { type: String },
-      proficiencyLevel: { type: Number, min: 1, max: 5 }
-    }],
-    algorithmsKnown: [{
-      algorithmName: { type: String },
-      isFamiliar: { type: Boolean, default: false }
-    }]
-  },
-  contactInfo: {
-    vjudgeUsername: { type: String },
-    phoneNumber: { type: String },
-    account: { type: String } // Assuming this refers to some account information
-  }
-});
+    user: userSchema, // Embedding User schema within Student for user-related details
+    generalInfo: {
+      universityID: { type: String }, // University ID
+      level: { type: String }, // Student's level
+      GPA: { type: Number } // GPA
+    },
+    skills: {
+      cProgramming: { type: Number, min: 1, max: 5 }, // C Programming proficiency
+      cppProgramming: { type: Number, min: 1, max: 5 }, // C++ Programming proficiency
+      pythonProgramming: { type: Number, min: 1, max: 5 }, // Python Programming proficiency
+      algorithmsKnown: {
+        DP: { type: Boolean, default: false }, // Dynamic Programming familiarity
+        Greedy: { type: Boolean, default: false }, // Greedy Algorithm familiarity
+        DivideAndConquer: { type: Boolean, default: false }, // Divide and Conquer familiarity
+        BruteForce: { type: Boolean, default: false } // Brute Force Algorithm familiarity
+      }
+    },
+    contactInfo: {
+      vjudgeUsername: { type: String }, // vJudge Username
+      phoneNumber: { type: String }, // Phone Number
+      account: { type: String } // Account information
+    }
+  });
 
 
 const Team = mongoose.model('Team', teamSchema);
@@ -841,3 +841,67 @@ app.get('/createTeam', (req, res) => {
 
 //Team End
 
+app.get('/students', (req, res) => {
+    res.render('students', { Student });
+  });
+
+  app.get('/profile', (req, res) => {
+    res.render('profile', { Student });
+  });
+
+
+  app.get('/getProfile/:profileId', async (req, res) => {
+    const profileId = req.params.profileId;
+  
+    try {
+      const profileData = await Student.findById(profileId).exec();
+      if (!profileData) {
+        return res.status(404).send('Profile not found');
+      }
+      res.json(profileData);
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+
+  app.get('/getProfile', async (req, res) => {
+    let profileId = '658c700b1f4acc92cb76031f';
+    if (!profileId) {
+      return res.status(400).send('Profile ID not found');
+    }
+  
+    try {
+      const profileData = await fetchProfileData(profileId);
+      res.render('profile', { profileData }); // Render the profile.ejs page with the fetched data
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+  
+  async function fetchProfileData(profileId) {
+    try {
+      const profileData = await Student.findById(profileId).exec();
+      return profileData; // Return the fetched profile data
+    } catch (error) {
+      throw new Error('Error fetching profile data');
+    }
+  }
+
+  
+  app.get('/profile', async (req, res) => {
+    try {
+      // Fetch profile data using the profile ID from the session or any logic you have
+      const profileId = '658c700b1f4acc92cb76031f'; // Replace with your logic to fetch profile ID
+      const profileData = await fetchProfileData(profileId); // Fetch profile data based on the profile ID
+    
+      res.render('profile', { profileData }); // Render 'profile.ejs' and pass profileData to the template
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
