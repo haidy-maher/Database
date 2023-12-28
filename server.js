@@ -908,69 +908,188 @@ app.get('/createTeam', (req, res) => {
 });
 
 
-//Team End
 
-app.get('/students', (req, res) => {
-    res.render('students', { Student });
-  });
-
-  app.get('/profile', (req, res) => {
-    res.render('profile', { Student });
-  });
+app.get('/profile', (req, res) => {
+  res.render('profile', { Student });
+});
 
 
-  app.get('/getProfile/:profileId', async (req, res) => {
-    const profileId = req.params.profileId;
-  
-    try {
-      const profileData = await Student.findById(profileId).exec();
-      if (!profileData) {
-        return res.status(404).send('Profile not found');
-      }
-      res.json(profileData);
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
-      res.status(500).send('Internal Server Error');
+app.get('/getProfile/:profileId', async (req, res) => {
+  const profileId = req.params.profileId;
+
+  try {
+    const profileData = await Student.findById(profileId).exec();
+    if (!profileData) {
+      return res.status(404).send('Profile not found');
     }
-  });
+    res.json(profileData);
+  } catch (error) {
+    console.error('Error fetching profile data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
-  app.get('/getProfile', async (req, res) => {
-    let profileId = '658c700b1f4acc92cb76031f';
-    if (!profileId) {
-      return res.status(400).send('Profile ID not found');
-    }
-  
-    try {
-      const profileData = await fetchProfileData(profileId);
-      res.render('profile', { profileData }); // Render the profile.ejs page with the fetched data
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-  
-  
-  async function fetchProfileData(profileId) {
-    try {
-      const profileData = await Student.findById(profileId).exec();
-      return profileData; // Return the fetched profile data
-    } catch (error) {
-      throw new Error('Error fetching profile data');
-    }
+app.get('/getProfile', async (req, res) => {
+  let profileId = '658c700b1f4acc92cb76031f';
+  if (!profileId) {
+    return res.status(400).send('Profile ID not found');
   }
 
+  try {
+    const profileData = await fetchProfileData(profileId);
+    res.render('profile', { profileData }); // Render the profile.ejs page with the fetched data
+  } catch (error) {
+    console.error('Error fetching profile data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+async function fetchProfileData(profileId) {
+  try {
+    const profileData = await Student.findById(profileId).exec();
+    return profileData; // Return the fetched profile data
+  } catch (error) {
+    throw new Error('Error fetching profile data');
+  }
+}
+
+
+app.get('/profile', async (req, res) => {
+  try {
+    // Fetch profile data using the profile ID from the session or any logic you have
+    const profileId = '658c700b1f4acc92cb76031f'; // Replace with your logic to fetch profile ID
+    const profileData = await fetchProfileData(profileId); // Fetch profile data based on the profile ID
   
-  app.get('/profile', async (req, res) => {
-    try {
-      // Fetch profile data using the profile ID from the session or any logic you have
-      const profileId = '658c700b1f4acc92cb76031f'; // Replace with your logic to fetch profile ID
-      const profileData = await fetchProfileData(profileId); // Fetch profile data based on the profile ID
-    
-      res.render('profile', { profileData }); // Render 'profile.ejs' and pass profileData to the template
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    res.render('profile', { profileData }); // Render 'profile.ejs' and pass profileData to the template
+  } catch (error) {
+    console.error('Error fetching profile data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/updateProfile', async (req, res) => {
+  // Retrieve profile ID from the session
+  let profileId = '658c700b1f4acc92cb76031f';
+
+  if (!profileId) {
+    return res.status(401).send('No profile ID in session');
+  }
+
+  const updatedData = req.body; // Data from the client
+
+  try {
+    // Update the profile in the database
+    await Student.findByIdAndUpdate(profileId, updatedData, { new: true });
+
+    // Send a success response or redirect
+    res.json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+///students
+
+
+// Assuming a route to fetch students
+app.get('/students', async (req, res) => {
+  try {
+    // Fetch data from the database
+    const students = await Student.find(); // Fetches all students
+
+    // Render the 'students.ejs' file and pass the retrieved data
+    res.render('students', { students: students });
+  } catch (err) {
+    // Handle errors appropriately
+    res.status(500).send('Error fetching students');
+  }
+});
+
+app.get('/getStudent/:id', async (req, res) => {
+  const studentId = req.params.id;
+
+  try {
+    console.log(studentId); // Log the studentId to the server console
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
     }
-  });
-  
+
+    // Extract the skills and send them as a JSON response
+    const { skills } = student;
+    res.json({ skills });
+  } catch (error) {
+    console.error('Error fetching student skills:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.get('/students', async (req, res) => {
+  try {
+    // Fetch teams from MongoDB or any data source
+    const students = await Student.find(); // Assuming Team is your Mongoose model
+
+    // Pass the teams data to the rendered page
+    res.render('students ', { students });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+app.get('/studentMaterial', async (req, res) => {
+  try {
+    // Fetch data from the "Material" collection
+    const materials = await Material.find();
+
+    res.render('studentMaterial', { materials }); // Pass the data to "material.ejs" for rendering
+  } catch (error) {
+    console.error('Error fetching materials:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+app.get('/studentMaterial', (req, res) => {
+  res.render('studentMaterial', { Student });
+});
+
+
+app.get('/studentAnnouncements', async (req, res) => {
+  try {
+    // Fetch data from the "Announcement" collection
+    const announcements = await Announcement.find();
+
+    res.render('studentAnnouncements', { announcements }); // Pass the data to "announcements.ejs" for rendering
+  } catch (error) {
+    console.error('Error fetching announcements:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/studentAnnouncements', (req, res) => {
+  res.render('studentAnnouncements', { Announcement });
+});
+
+
+app.get('/studentSessions', async (req, res) => {
+  try {
+    const sessions = await Sessions.find(); // Fetch sessions from the database
+
+    res.render('studentSessions', { sessions }); // Pass fetched sessions to the 'sessions.ejs' view
+  } catch (error) {
+    console.error('Error fetching sessions:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/studentSessions', (req, res) => {
+  res.render('studentSessions', { Sessions });
+});
