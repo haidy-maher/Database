@@ -1093,3 +1093,15 @@ app.get('/studentSessions', async (req, res) => {
 app.get('/studentSessions', (req, res) => {
   res.render('studentSessions', { Sessions });
 });
+
+
+app.get('/logout', (req, res) => {
+  // Destroy the user's session to log them out
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+    }
+    // Redirect the user to the root URL after logout
+    res.redirect('/');
+  });
+});
